@@ -32,6 +32,7 @@ typedef struct term_tag{
 }term_t;
 
 void term_init(term_t* term, size_t width, size_t height, enum vga_color fg, enum vga_color bg, uint16_t* buffer);
+void term_scroll(term_t* term);
 void term_clear(term_t* term, char c);
 void term_setcolor(term_t* term, uint8_t color);
 void term_writestring(term_t* term, const char* data);

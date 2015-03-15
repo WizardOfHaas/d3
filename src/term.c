@@ -46,10 +46,15 @@ void term_clear(term_t* term, char c){
 	}
     }
 }
+
+void term_scroll(term_t* term){
+  movemem(term->buffer - 80, term->buffer, 80*25);
+}
  
 void term_setcolor(term_t* term, uint8_t color)
 {
   term->color = color;
+  term->xpos--;
 }
  
 void term_putentryat(term_t* term, char c, size_t x, size_t y)
@@ -71,7 +76,7 @@ void term_putchar(term_t* term, char c)
 	term->ypos = 0;
 	if ( ++term->xpos == term->height )
 	  {
-	    term->xpos = 0;
+	    term_scroll(term);
 	  }
       }
   }
