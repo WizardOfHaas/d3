@@ -4,12 +4,14 @@ all:
 		./src/kernel.c \
 		./src/mem.c \
 		./src/term.c \
+		./src/str.c \
 		 -std=gnu99 -ffreestanding -O2 -Wall -Wextra
 	~/opt/cross/bin/i686-elf-gcc -T linker.ld -o d3.kernel -ffreestanding -O2 -nostdlib \
 		boot.o \
 		kernel.o \
 		mem.o \
 		term.o \
+		str.o \
 		-lgcc
 
 install:

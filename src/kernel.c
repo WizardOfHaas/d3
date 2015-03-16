@@ -2,15 +2,23 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "multiboot.h"
 #include "term.h"
 #include "mem.h"
+#include "str.h"
 
 term_t tty0;
 
-void cmain()
+void cmain(multiboot_info_t* mbd)
 {
+  //Initialize first terminal
   term_init(&tty0, 80, 25, COLOR_GREEN, COLOR_BLACK, (uint16_t*) 0xB8000);
  
-  term_writestring(&tty0, "Hello, World!\n"); 
-  term_writestring(&tty0, "Welcome to d3\n");
+  //Splash...
+  term_writestring(&tty0, "d3 Booting...\n");
+
+  //Init memory manager and print some stats...
+  init_mm(mbd);
+  term_writestring(&tty0, itoa(mem_size/1024, 10));
+  term_writestring(&tty0, "Mb memory detected...");
 }

@@ -1,4 +1,5 @@
-//Screen/terminal stuff
+#include <stddef.h>
+#include <stdint.h>
 
 enum vga_color
   {
