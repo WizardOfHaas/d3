@@ -20,5 +20,11 @@ void cmain(multiboot_info_t* mbd)
   //Init memory manager and print some stats...
   init_mm(mbd);
   term_writestring(&tty0, itoa(mem_size/1024, 10));
-  term_writestring(&tty0, "Mb memory detected...");
+  term_writestring(&tty0, "Mb memory detected...\nUsed Segments:\n");
+
+  for(int i = 0; i < used.top; i++){
+    multiboot_memory_map_t* mmap = used.data[i];
+    term_writestring(&tty0, itoa(mmap->addr, 16));
+    term_writestring(&tty0, "\n");
+  }
 }

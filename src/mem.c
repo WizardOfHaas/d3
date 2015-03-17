@@ -36,12 +36,12 @@ void init_mm(multiboot_info_t* mbd){
   multiboot_memory_map_t* mmap = mbd->mmap_addr;
 
   while(mmap < mbd->mmap_addr + mbd->mmap_length){
-    //REFORMAT!
-    
+    //REFORMAT!   
+
     if(mmap->type == 1){
-      stack_push(&free, mmap);
+      stack_push(&free, &mmap);
     }else{
-      stack_push(&used, mmap);
+      stack_push(&used, &mmap);
     }
 
     mmap = (multiboot_memory_map_t*) ((unsigned int)mmap + mmap->size + sizeof(unsigned int));
