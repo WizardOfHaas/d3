@@ -2,8 +2,8 @@
 #include "kernel.h"
 #include "mem.h"
 
-mp_t* free;
-mp_t* used;
+stack_t free;
+stack_t used;
 int mem_size;
 
 void* movemem(void* dstptr, const void* srcptr, size_t size){
@@ -27,20 +27,40 @@ void* movemem(void* dstptr, const void* srcptr, size_t size){
 }
 
 void init_mm(multiboot_info_t* mbd){
-  mem_size = mbd->mem_lower + mbd->mem_upper + 1;
+  init_stack(&free);  
+  init_stack(&used);
+
+  mem_size = mbd->mem_lower + mbd->mem_upper + 1024;
 
   //GET MMAP
   multiboot_memory_map_t* mmap = mbd->mmap_addr;
 
   while(mmap < mbd->mmap_addr + mbd->mmap_length){
     //REFORMAT!
-    //term_writestring(&tty0, itoa(mmap->addr, 10));
-    //term_writestring(&tty0, ":");
-    //term_writestring(&tty0, itoa(mmap->base_addr_high, 10));
-    //term_writestring(&tty0, "\n");
+    
+    if(mmap->type == 1){
+      stack_push(&free, mmap);
+    }else{
+      stack_push(&used, mmap);
+    }
+
     mmap = (multiboot_memory_map_t*) ((unsigned int)mmap + mmap->size + sizeof(unsigned int));
   }
 
   //LOAD INTO FREE/USED LINKED LIST STRUCTS
   //BREAK FREE INTO CHUNKS BASED ON FIBO
+}
+
+void init_stack(stack_t* stack){
+  stack->top = 0;
+}
+
+void stack_push(stack_t* stack, void* el){
+  stack->data[stack->top] = *((int*)el);
+  stack->top++;
+}
+
+void* stack_pop(stack_t* stack){
+  stack->top--;
+  return stack->data[stack->top + 1];
 }
