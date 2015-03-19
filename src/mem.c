@@ -1,9 +1,23 @@
+#ifndef TERM_H
+#define TERM_H
+#include "term.h"
+#endif
+
 #include "multiboot.h"
-#include "kernel.h"
+#include "str.h"
 #include "mem.h"
+#include "kernel.h"
 
 stack_t free;
 stack_t used;
+
+mp_t* mm_free;
+mp_t* mm_used;
+
+uint64_t mm_heap_bottom;
+uint64_t mm_heap_top;
+uint64_t mm_heap_size = sizeof(mp_t)*256;
+
 int mem_size;
 
 void* movemem(void* dstptr, const void* srcptr, size_t size){
@@ -32,12 +46,11 @@ void init_mm(multiboot_info_t* mbd){
 
   mem_size = mbd->mem_lower + mbd->mem_upper + 1024;
 
-  //GET MMAP
+  //Grab and prep to traverse mmap from grub
   multiboot_memory_map_t* mmap = mbd->mmap_addr;
 
   while(mmap < mbd->mmap_addr + mbd->mmap_length){
-    //REFORMAT!   
-
+    //Make into stacks to translate later...
     if(mmap->type == 1){
       stack_push(&free, &mmap);
     }else{
@@ -47,7 +60,19 @@ void init_mm(multiboot_info_t* mbd){
     mmap = (multiboot_memory_map_t*) ((unsigned int)mmap + mmap->size + sizeof(unsigned int));
   }
 
-  //LOAD INTO FREE/USED LINKED LIST STRUCTS
+  //Find somewhere to start a linked list for free/used management...
+  multiboot_memory_map_t* free_top = free.data[free.top - 1];  
+  if(free_top->len > mm_heap_size){
+    //Its big enough!
+    mm_heap_bottom = free_top->addr;
+    mp_t* free = (mp_t*)(unsigned int)free_top->addr;
+    mp_t* used = (mp_t*)((unsigned int)free_top->addr + sizeof(mp_t));
+    mm_heap_top = mm_heap_bottom + 2*sizeof(mp_t);
+  }else{
+    //Rats! An error should be here!
+    kernel_panic("init_mm: Rats! Not enough free memory!");
+  }
+
   //BREAK FREE INTO CHUNKS BASED ON FIBO
 }
 
@@ -63,4 +88,17 @@ void stack_push(stack_t* stack, void* el){
 void* stack_pop(stack_t* stack){
   stack->top--;
   return stack->data[stack->top + 1];
+}
+
+void mem_dump(term_t* term, void* addr, size_t size){
+  unsigned char* data = (unsigned char*) addr;
+  size_t i = 0;  
+  
+  term_writestring(term, itoa(&addr, 16));
+  term_writestring(term, ":");
+
+  while(i <= size){
+    term_writestring(term, itoa(data[i], 16));
+    i++;
+  }
 }

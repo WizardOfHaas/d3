@@ -22,3 +22,6 @@ install:
 clean:
 	rm *.o
 	rm d3.kernel
+
+test:
+	qemu -fda disk.img

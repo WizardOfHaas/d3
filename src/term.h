@@ -36,4 +36,6 @@ void term_init(term_t* term, size_t width, size_t height, enum vga_color fg, enu
 void term_scroll(term_t* term);
 void term_clear(term_t* term, char c);
 void term_setcolor(term_t* term, uint8_t color);
+uint8_t make_color(enum vga_color fg, enum vga_color bg);
+void term_putchar(term_t* term, char c);
 void term_writestring(term_t* term, const char* data);

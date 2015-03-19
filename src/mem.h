@@ -19,6 +19,7 @@ int mem_size;
 
 void* memmove(void* dstptr, const void* srcptr, size_t size);
 void init_mm(multiboot_info_t* mbd);
+void mem_dump(term_t* term, void* addr, size_t size);
 
 void init_stack(stack_t* stack);
 void stack_push(stack_t* stack, void* el);
