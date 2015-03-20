@@ -61,20 +61,56 @@ void init_mm(multiboot_info_t* mbd){
   }
 
   //Find somewhere to start a linked list for free/used management...
-  multiboot_memory_map_t* free_top = free.data[free.top - 1];  
+  multiboot_memory_map_t* free_top = free.data[free.top - 1];
   if(free_top->len > mm_heap_size){
     //Its big enough!
     mm_heap_bottom = free_top->addr;
-    mp_t* free = (mp_t*)(unsigned int)free_top->addr;
-    mp_t* used = (mp_t*)((unsigned int)free_top->addr + sizeof(mp_t));
-    mm_heap_top = mm_heap_bottom + 2*sizeof(mp_t);
+    mm_heap_top = mm_heap_bottom + mm_heap_size;
+    
+    //Setup first free struct...
+    mm_free = (mp_t*)(unsigned int)free_top->addr;
+    mm_free->address = (void*)mm_heap_top;
+    mm_free->size = free_top->len - mm_heap_size;
+
+    //And reserve a small heap as first used struct
+    mm_used = (mp_t*)((unsigned int)free_top->addr + sizeof(mp_t));
+    mm_used->address = (void*)mm_heap_bottom;
+    mm_used->size = mm_heap_size;
   }else{
     //Rats! An error should be here!
     kernel_panic("init_mm: Rats! Not enough free memory!");
   }
 
-  //BREAK FREE INTO CHUNKS BASED ON FIBO
-}
+  /*
+    Break free memory into chunks for buddy fit
+    Sizes: n^2 [0, 64]Kb    
+   */
+  //Get amount of free after mm_heap reserved
+  size_t free_size = free_top->len - mm_heap_size;
+  size_t buddy_size = (64*1024) + (7*sizeof(mp_t));
+  //How many buddies can I start with?
+  size_t num_buddies = free_size/buddy_size;
+
+  term_writestring(&tty0, "Free Memory:");
+  term_writestring(&tty0, itoa(free_size, 10));
+
+  term_writestring(&tty0, "\nMax Buddy Size:");
+  term_writestring(&tty0, itoa(buddy_size, 10));
+
+  term_writestring(&tty0, "\nNumber of Big Buddies:");
+  term_writestring(&tty0, itoa(num_buddies, 10));
+
+  if(num_buddies < 1){
+    kernel_panic("init_mm: Darn! Not enough memory to have any buddies!");
+  }
+  
+  //Lets start filling in the buddies!  
+  for(int i = 0; i < num_buddies; i++){
+    uint64_t buddy_addr = free_top->addr + i*buddy_size;
+    term_writestring(&tty0, "\n");
+    term_writestring(&tty0, itoa(buddy_addr, 10));
+  }
+ }
 
 void init_stack(stack_t* stack){
   stack->top = 0;

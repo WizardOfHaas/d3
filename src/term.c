@@ -48,6 +48,7 @@ void term_clear(term_t* term, char c){
 }
 
 void term_scroll(term_t* term){
+  //HERE IS PROBLEM!
   movemem(term->buffer - 80, term->buffer, 80*25);
 }
  

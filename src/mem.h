@@ -3,7 +3,7 @@
 #include "multiboot.h"
 
 typedef struct memory_page_tag{
-  void *adress;
+  void *address;
   size_t size;
   struct mp_t *next;
 }mp_t;
@@ -16,6 +16,9 @@ typedef struct stack_tag{
 stack_t free;
 stack_t used;
 int mem_size;
+
+mp_t* mm_free;
+mp_t* mm_used;
 
 void* memmove(void* dstptr, const void* srcptr, size_t size);
 void init_mm(multiboot_info_t* mbd);
