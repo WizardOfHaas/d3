@@ -48,14 +48,12 @@ void term_clear(term_t* term, char c){
 }
 
 void term_scroll(term_t* term){
-  //HERE IS PROBLEM!
-  movemem(term->buffer - 80, term->buffer, 80*25);
+  movemem(term->buffer, term->buffer + term->width, term->width*term->height*2);
 }
  
 void term_setcolor(term_t* term, uint8_t color)
 {
   term->color = color;
-  term->xpos--;
 }
  
 void term_putentryat(term_t* term, char c, size_t x, size_t y)
@@ -67,19 +65,23 @@ void term_putentryat(term_t* term, char c, size_t x, size_t y)
 void term_putchar(term_t* term, char c)
 {
   if(c == '\n'){
-    term->ypos = 0;
-    term->xpos++;
+    term->xpos = 0;
+    term->ypos++;
   }else{
-    term_putentryat(term, c, term->ypos, term->xpos);
+    term_putentryat(term, c, term->xpos, term->ypos);
 
-    if ( ++term->ypos == term->width )
+    if ( ++term->xpos == term->width )
       {
-	term->ypos = 0;
-	if ( ++term->xpos == term->height )
-	  {
-	    term_scroll(term);
-	  }
+	term->xpos = 0;
+	term->ypos++;
       }
+
+    if ( term->ypos >= term->height )
+      {
+	term_scroll(term);
+	term->xpos = 0;
+	term->ypos--;	
+      }   
   }
 }
  
