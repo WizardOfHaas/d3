@@ -79,8 +79,7 @@ void term_putchar(term_t* term, char c)
     if ( term->ypos >= term->height )
       {
 	term_scroll(term);
-	term->xpos = 0;
-	term->ypos--;	
+	term->ypos--;
       }   
   }
 }

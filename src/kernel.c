@@ -27,5 +27,5 @@ void cmain(multiboot_info_t* mbd)
   term_writestring(&tty0, "d3 Booting...\n");
 
   //Init memory manager and print some stats...
-  init_mm(mbd); 
+  init_mm(mbd);
 }
