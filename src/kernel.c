@@ -28,4 +28,15 @@ void cmain(multiboot_info_t* mbd)
 
   //Init memory manager and print some stats...
   init_mm(mbd);
+  
+  mp_t* temp = mm_free->next;  
+  for(int i = 0; i < 10 && temp->next != NULL; i++){    
+    term_writestring(&tty0, "\n---Sample Buddy---\nAddress:");
+    term_writestring(&tty0, itoa(temp->address, 10));
+
+    term_writestring(&tty0, "\nSize:");
+    term_writestring(&tty0, itoa(temp->size, 10));
+
+    temp = temp->next;
+  }
 }
