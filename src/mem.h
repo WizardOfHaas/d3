@@ -1,11 +1,14 @@
 #include <stddef.h>
 
 #include "multiboot.h"
+#include "list.h"
 
 typedef struct memory_page_tag{
+  struct mp_t *prev;
+  struct mp_t *next;
+
   void *address;
   size_t size;
-  struct mp_t *next;
 }mp_t;
 
 typedef struct stack_tag{
@@ -20,8 +23,11 @@ int mem_size;
 mp_t* mm_free;
 mp_t* mm_used;
 
+list *mm_list;
+
 void* memmove(void* dstptr, const void* srcptr, size_t size);
 void init_mm(multiboot_info_t* mbd);
+void* add_buddy(mp_t* entry, mp_t* new);
 void mem_dump(term_t* term, void* addr, size_t size);
 
 void init_stack(stack_t* stack);

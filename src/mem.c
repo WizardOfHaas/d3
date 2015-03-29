@@ -5,6 +5,7 @@
 
 #include "multiboot.h"
 #include "str.h"
+#include "list.h"
 #include "mem.h"
 #include "kernel.h"
 
@@ -105,6 +106,8 @@ void init_mm(multiboot_info_t* mbd){
   if(num_buddies < 1){
     kernel_panic("init_mm: Darn! Not enough memory to have any buddies!");
   }
+
+  init_list(mm_list, list_insert_mm_t);
   
   //Lets start filling in the buddies!
   for(int i = 0; i < num_buddies; i++){
@@ -113,26 +116,31 @@ void init_mm(multiboot_info_t* mbd){
     
     //Break this into smaller buddies...using structs!
     size_t new_buddy_size = 64;
-    mp_t* last_buddy; //Keep track of last buddy to build linked list
     while(new_buddy_size >= 1){
+      //Build up the buddy struct...
       mp_t* buddy = (mp_t*)buddy_addr;
       uint64_t address = buddy_addr + sizeof(mp_t) + new_buddy_size*1024;
       buddy->address = (void*)address;
       buddy->size = new_buddy_size*1024;
-      add_buddy(mm_free, buddy);
+
+      //Put it in the list and move onto the next one!
+      list_add_elem(mm_list, buddy);
       new_buddy_size = new_buddy_size/2;
     }
   }
  }
 
-void add_buddy(mp_t* entry, mp_t* new){
-  mp_t* current = entry;
+void* add_buddy(mp_t* entry, mp_t* new){
+  /*mp_t* current = entry;
   while(current->next != NULL){    
     current = current->next;
   }
 
   current->next = new;
-  new->next = NULL;
+  new->next = NULL;*/
+
+  new->next = entry;
+  return new;
 }
 
 void init_stack(stack_t* stack){
