@@ -5,7 +5,6 @@
 
 #include "multiboot.h"
 #include "str.h"
-#include "list.h"
 #include "mem.h"
 #include "kernel.h"
 
@@ -73,74 +72,35 @@ void init_mm(multiboot_info_t* mbd){
     mm_free->address = (void*)mm_heap_top;
     mm_free->size = free_top->len - mm_heap_size;
     mm_free->next = NULL;
+    mm_free->prev = NULL;
 
     //And reserve a small heap as first used struct
     mm_used = (mp_t*)((unsigned int)free_top->addr + sizeof(mp_t));
     mm_used->address = (void*)mm_heap_bottom;
     mm_used->size = mm_heap_size;
     mm_used->next = NULL;
+    mm_used->prev = NULL;
   }else{
     //Rats! An error should be here!
     kernel_panic("init_mm: Rats! Not enough free memory!");
   }
 
-  /*
-    Break free memory into chunks for buddy fit
-    Sizes: n^2 [0, 64]Kb    
-   */
-  //Get amount of free after mm_heap reserved
-  size_t free_size = free_top->len - mm_heap_size;
-  size_t max_buddy_size = (64*1024) + (7*sizeof(mp_t));
-  //How many buddies can I start with?
-  size_t num_buddies = free_size/max_buddy_size;
+  mp_t *test;
+  test->size = 1024;  
+  add_buddy(mm_free, test);
+}
 
-  term_writestring(&tty0, "Free Memory:");
-  term_writestring(&tty0, itoa(free_size, 10));
-
-  term_writestring(&tty0, "\nMax Buddy Size:");
-  term_writestring(&tty0, itoa(max_buddy_size, 10));
-
-  term_writestring(&tty0, "\nNumber of Big Buddies:");
-  term_writestring(&tty0, itoa(num_buddies, 10));
-
-  if(num_buddies < 1){
-    kernel_panic("init_mm: Darn! Not enough memory to have any buddies!");
+void* malloc(size_t size){
+  mp_t *temp = mm_free;
+  while(temp->next != NULL){
+    temp = temp->next;
   }
+}
 
-  init_list(mm_list, list_insert_mm_t);
-  
-  //Lets start filling in the buddies!
-  for(int i = 0; i < num_buddies; i++){
-    //Calc start of this buddy chunk
-    uint64_t buddy_addr = free_top->addr + i*max_buddy_size;
-    
-    //Break this into smaller buddies...using structs!
-    size_t new_buddy_size = 64;
-    while(new_buddy_size >= 1){
-      //Build up the buddy struct...
-      mp_t* buddy = (mp_t*)buddy_addr;
-      uint64_t address = buddy_addr + sizeof(mp_t) + new_buddy_size*1024;
-      buddy->address = (void*)address;
-      buddy->size = new_buddy_size*1024;
-
-      //Put it in the list and move onto the next one!
-      list_add_elem(mm_list, buddy);
-      new_buddy_size = new_buddy_size/2;
-    }
-  }
- }
-
-void* add_buddy(mp_t* entry, mp_t* new){
-  /*mp_t* current = entry;
-  while(current->next != NULL){    
-    current = current->next;
-  }
-
-  current->next = new;
-  new->next = NULL;*/
-
-  new->next = entry;
-  return new;
+void add_buddy(mp_t* entry, mp_t* new){
+  new->prev = entry;
+  new->next = entry->next;
+  entry->next = new;
 }
 
 void init_stack(stack_t* stack){
