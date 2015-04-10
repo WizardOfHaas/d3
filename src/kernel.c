@@ -31,10 +31,10 @@ void cmain(multiboot_info_t* mbd)
   init_mm(mbd);
   term_writestring(&tty0, "[OK]\n");
 
-  /*mp_t *temp = mm_free;
+  mp_t *temp = mm_free;
   term_writestring(&tty0, "\nBuddy:");
   term_writestring(&tty0, itoa(temp->size, 10));
   temp = temp->next;
   term_writestring(&tty0, "\nBuddy:");
-  term_writestring(&tty0, itoa(temp->size, 10));*/
+  term_writestring(&tty0, itoa(temp->size, 10));
 }
