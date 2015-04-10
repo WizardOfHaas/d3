@@ -1,3 +1,6 @@
+#ifndef MEM_H
+#define MEM_H
+
 #include <stddef.h>
 
 #include "multiboot.h"
@@ -30,3 +33,5 @@ void mem_dump(term_t* term, void* addr, size_t size);
 void init_stack(stack_t* stack);
 void stack_push(stack_t* stack, void* el);
 void* stack_pop(stack_t* stack);
+
+#endif

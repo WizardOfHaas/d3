@@ -21,7 +21,7 @@ void kernel_panic(const char* c){
 void cmain(multiboot_info_t* mbd)
 {
   //Initialize first terminal
-  term_init(&tty0, 80, 25, COLOR_GREEN, COLOR_BLACK, (uint16_t*) 0xB8000);
+  term_init(&tty0, 80, 25, COLOR_LIGHT_GREY, COLOR_BLACK, (uint16_t*) 0xB8000);
  
   //Splash...
   term_writestring(&tty0, "d3 Booting...\n\n");
@@ -31,9 +31,10 @@ void cmain(multiboot_info_t* mbd)
   init_mm(mbd);
   term_writestring(&tty0, "[OK]\n");
 
-  mp_t *temp = mm_free;
-  while(temp->next != NULL){
-    term_writestring(&tty0, itoa(temp->size, 10));
-    temp = temp->next;
-  }
+  /*mp_t *temp = mm_free;
+  term_writestring(&tty0, "\nBuddy:");
+  term_writestring(&tty0, itoa(temp->size, 10));
+  temp = temp->next;
+  term_writestring(&tty0, "\nBuddy:");
+  term_writestring(&tty0, itoa(temp->size, 10));*/
 }

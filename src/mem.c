@@ -67,19 +67,17 @@ void init_mm(multiboot_info_t* mbd){
     mm_heap_bottom = free_top->addr;
     mm_heap_top = mm_heap_bottom + mm_heap_size;
     
-    //Setup first free struct...
-    mm_free = (mp_t*)(unsigned int)free_top->addr;
-    mm_free->address = (void*)mm_heap_top;
-    mm_free->size = free_top->len - mm_heap_size;
+    //Setup first entry in free list
     mm_free->next = NULL;
     mm_free->prev = NULL;
-
-    //And reserve a small heap as first used struct
-    mm_used = (mp_t*)((unsigned int)free_top->addr + sizeof(mp_t));
-    mm_used->address = (void*)mm_heap_bottom;
-    mm_used->size = mm_heap_size;
+    mm_free->address = (void*)mm_heap_top;
+    mm_free->size = free_top->len - mm_heap_size;
+    
+    //Setup first entry in used list
     mm_used->next = NULL;
     mm_used->prev = NULL;
+    mm_used->address = (void*)mm_heap_bottom;
+    mm_used->size = mm_heap_size;
   }else{
     //Rats! An error should be here!
     kernel_panic("init_mm: Rats! Not enough free memory!");
@@ -119,13 +117,15 @@ void* stack_pop(stack_t* stack){
 
 void mem_dump(term_t* term, void* addr, size_t size){
   unsigned char* data = (unsigned char*) addr;
-  size_t i = 0;  
-  
+  size_t i = 0;
+    
   term_writestring(term, itoa(&addr, 16));
-  term_writestring(term, ":");
+  term_writestring(term, "|");
 
-  while(i <= size){
+  while(i < size){
     term_writestring(term, itoa(data[i], 16));
+    term_writestring(term, ":");
     i++;
   }
+  term_writestring(term, "\n");
 }
