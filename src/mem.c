@@ -11,8 +11,8 @@
 stack_t free;
 stack_t used;
 
-mp_t* mm_free;
-mp_t* mm_used;
+mp_t mm_free;
+mp_t mm_used;
 
 uint64_t mm_heap_bottom;
 uint64_t mm_heap_top;
@@ -68,37 +68,63 @@ void init_mm(multiboot_info_t* mbd){
     mm_heap_top = mm_heap_bottom + mm_heap_size;
     
     //Setup first entry in free list
-    mm_free->next = NULL;
-    mm_free->prev = NULL;
-    mm_free->address = (void*)mm_heap_top;
-    mm_free->size = free_top->len - mm_heap_size;
+    mm_free.next = NULL;
+    mm_free.prev = NULL;
+    mm_free.address = (void*)mm_heap_top;
+    mm_free.size = free_top->len - mm_heap_size;
     
     //Setup first entry in used list
-    mm_used->next = NULL;
-    mm_used->prev = NULL;
-    mm_used->address = (void*)mm_heap_bottom;
-    mm_used->size = mm_heap_size;
+    mm_used.next = NULL;
+    mm_used.prev = NULL;
+    mm_used.address = (void*)mm_heap_bottom;
+    mm_used.size = mm_heap_size;
   }else{
     //Rats! An error should be here!
     kernel_panic("init_mm: Rats! Not enough free memory!");
   }
 
-  mp_t *test;
-  test->size = 1024;  
-  add_buddy(mm_free, test);
+  mp_t test;
+  test.size = 1024;
+  add_mm_list_entry(&mm_free, &test);
 }
 
 void* malloc(size_t size){
-  mp_t *temp = mm_free;
+  mp_t *temp = &mm_free;
+  mp_t *largest = &mm_free;
   while(temp->next != NULL){
+    //Is the buddy within spec?
+    if(temp->size > size && temp->size < (size * 1.25)){
+      //Its a fit! Record that this is in use.
+      remove_mm_list_entry(temp);
+      add_mm_list_entry(&mm_used, temp);
+      return temp;
+      break;
+    }
+    
+    //Keep track of largest buddy we find for later...
+    if(temp->size > largest->size){
+      largest = temp;
+    }
+   
     temp = temp->next;
   }
+
+  //Didn't find a good buddy. Lets make one!
+  largest->size -= (size + sizeof(mp_t));
+  temp = (mp_t*)(&largest + largest->size);
+  temp->size = size;
+  temp->address = (void*)(&temp + sizeof(mp_t));
+  return temp;
 }
 
-void add_buddy(mp_t* entry, mp_t* new){
+void add_mm_list_entry(mp_t* entry, mp_t* new){
   new->prev = entry;
   new->next = entry->next;
   entry->next = new;
+}
+
+void remove_mm_list_entry(mp_t* entry){
+  
 }
 
 void init_stack(stack_t* stack){

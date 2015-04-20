@@ -31,10 +31,18 @@ void cmain(multiboot_info_t* mbd)
   init_mm(mbd);
   term_writestring(&tty0, "[OK]\n");
 
-  mp_t *temp = mm_free;
-  term_writestring(&tty0, "\nBuddy:");
-  term_writestring(&tty0, itoa(temp->size, 10));
-  temp = temp->next;
-  term_writestring(&tty0, "\nBuddy:");
-  term_writestring(&tty0, itoa(temp->size, 10));
+  mp_t *temp = &mm_free;
+  
+  while(temp->next != NULL){
+    term_writestring(&tty0, "\nBuddy:@");
+    term_writestring(&tty0, itoa(temp, 16));
+    term_writestring(&tty0, "\n Size:");
+    term_writestring(&tty0, itoa(temp->size, 10));
+    temp = temp->next;
+  }
+
+  term_writestring(&tty0, "\nCalling Malloc:\n ");
+  void *test = malloc(1024);
+  term_writestring(&tty0, "b\n Page:@");
+  term_writestring(&tty0, itoa(test, 16));
 }

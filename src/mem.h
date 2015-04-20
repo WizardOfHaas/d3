@@ -22,8 +22,8 @@ stack_t free;
 stack_t used;
 int mem_size;
 
-mp_t* mm_free;
-mp_t* mm_used;
+mp_t mm_free;
+mp_t mm_used;
 
 void* memmove(void* dstptr, const void* srcptr, size_t size);
 void init_mm(multiboot_info_t* mbd);
