@@ -27,6 +27,7 @@ mp_t mm_used;
 
 void* memmove(void* dstptr, const void* srcptr, size_t size);
 void init_mm(multiboot_info_t* mbd);
+mp_t* malloc(size_t size);
 void add_buddy(mp_t* entry, mp_t* new);
 void mem_dump(term_t* term, void* addr, size_t size);
 

@@ -88,7 +88,7 @@ void init_mm(multiboot_info_t* mbd){
   add_mm_list_entry(&mm_free, &test);
 }
 
-void* malloc(size_t size){
+mp_t* malloc(size_t size){
   mp_t *temp = &mm_free;
   mp_t *largest = &mm_free;
   while(temp->next != NULL){
@@ -106,14 +106,22 @@ void* malloc(size_t size){
       largest = temp;
     }
    
-    temp = temp->next;
+    temp = &temp->next;
   }
 
   //Didn't find a good buddy. Lets make one!
+  //Start by shrinking the largest buddy we found...
   largest->size -= (size + sizeof(mp_t));
-  temp = (mp_t*)(&largest + largest->size);
+
+  //Make temp point to the unused area we just made...
+  temp = (mp_t*)(largest + largest->size);
+
+  //Fill in the specifics...
   temp->size = size;
-  temp->address = (void*)(&temp + sizeof(mp_t));
+  temp->address = (void*)(temp + sizeof(mp_t));
+
+  mem_dump(&tty0, temp, sizeof(mp_t));
+
   return temp;
 }
 
@@ -145,7 +153,7 @@ void mem_dump(term_t* term, void* addr, size_t size){
   unsigned char* data = (unsigned char*) addr;
   size_t i = 0;
     
-  term_writestring(term, itoa(&addr, 16));
+  term_writestring(term, itoa(addr, 16));
   term_writestring(term, "|");
 
   while(i < size){
