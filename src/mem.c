@@ -114,7 +114,7 @@ mp_t* malloc(size_t size){
   largest->size -= (size + sizeof(mp_t));
 
   //Make temp point to the unused area we just made...
-  temp = (mp_t*)(largest + largest->size);
+  temp = (mp_t*)(largest->address + largest->size);
 
   //Fill in the specifics...
   temp->size = size;

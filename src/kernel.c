@@ -48,7 +48,7 @@ void cmain(multiboot_info_t* mbd)
 
   term_writestring(&tty0, "\nCalling Malloc:\n");
   mp_t *test = malloc(1024);
-  term_writestring(&tty0, itoa(test->size, 16));
+  term_writestring(&tty0, itoa(test->size, 10));
   term_writestring(&tty0, "b\n Page:@");
   term_writestring(&tty0, itoa(test->address, 16));
 }
