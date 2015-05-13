@@ -120,7 +120,7 @@ mp_t* malloc(size_t size){
   temp->size = size;
   temp->address = (void*)(temp + sizeof(mp_t));
 
-  mem_dump(&tty0, temp, sizeof(mp_t));
+  add_mm_list_entry(&mm_used, temp);
 
   return temp;
 }
