@@ -8,7 +8,7 @@
 #include "mem.h"
 #include "kernel.h"
 
-stack_t free;
+stack_t mb_free;
 stack_t used;
 
 mp_t mm_free;
@@ -41,7 +41,7 @@ void* movemem(void* dstptr, const void* srcptr, size_t size){
 }
 
 void init_mm(multiboot_info_t* mbd){
-  init_stack(&free);  
+  init_stack(&mb_free);  
   init_stack(&used);
 
   mem_size = mbd->mem_lower + mbd->mem_upper + 1024;
@@ -52,7 +52,7 @@ void init_mm(multiboot_info_t* mbd){
   while(mmap < mbd->mmap_addr + mbd->mmap_length){
     //Make into stacks to translate later...
     if(mmap->type == 1){
-      stack_push(&free, &mmap);
+      stack_push(&mb_free, &mmap);
     }else{
       stack_push(&used, &mmap);
     }
@@ -61,7 +61,7 @@ void init_mm(multiboot_info_t* mbd){
   }
 
   //Find somewhere to start a linked list for free/used management...
-  multiboot_memory_map_t* free_top = free.data[free.top - 1];
+  multiboot_memory_map_t* free_top = mb_free.data[mb_free.top - 1];
   if(free_top->len > mm_heap_size){
     //Its big enough!
     mm_heap_bottom = free_top->addr;
@@ -93,7 +93,7 @@ mp_t* malloc(size_t size){
   mp_t *largest = &mm_free;
   while(temp->next != NULL){
     //Is the buddy within spec?
-    if(temp->size > size && temp->size < (size * 1.25)){
+    if(temp->size >= size && temp->size <= (size * 2)){
       //Its a fit! Record that this is in use.
       remove_mm_list_entry(temp);
       add_mm_list_entry(&mm_used, temp);
@@ -106,10 +106,15 @@ mp_t* malloc(size_t size){
       largest = temp;
     }
    
-    temp = &temp->next;
+    temp = temp->next;
   }
 
-  //Didn't find a good buddy. Lets make one!
+  //Didn't find a good buddy. Lets make one!  
+  //But first make sure we have enough space...
+  if(largest->size < size){
+    kernel_panic("STRAIGHT UP OUT OF RAM!!");
+  }
+
   //Start by shrinking the largest buddy we found...
   largest->size -= (size + sizeof(mp_t));
 
@@ -125,14 +130,26 @@ mp_t* malloc(size_t size){
   return temp;
 }
 
+void free(mp_t *entry){
+  remove_mm_list_entry(entry);
+  add_mm_list_entry(&mm_free, entry);
+}
+
 void add_mm_list_entry(mp_t* entry, mp_t* new){
   new->prev = entry;
   new->next = entry->next;
   entry->next = new;
 }
 
-void remove_mm_list_entry(mp_t* entry){
-  
+void remove_mm_list_entry(mp_t *entry){
+  mp_t *prev = entry->prev;
+  mp_t *next = entry->next;
+
+  prev->next = next;
+  next->prev = prev;
+
+  entry->prev = NULL;
+  entry->next = NULL;
 }
 
 void init_stack(stack_t* stack){
