@@ -29,5 +29,5 @@ void cmain(multiboot_info_t* mbd)
   //Init memory manager and print some stats...
   term_writestring(&tty0, "Initializing memory manager...");
   init_mm(mbd);
-  term_writestring(&tty0, "[OK]\n");
+  term_writestring(&tty0, "[OK]\n");  
 }

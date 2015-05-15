@@ -85,6 +85,21 @@ void init_mm(multiboot_info_t* mbd){
 
   mp_t *test = malloc(1024);
   free(test);
+
+  print_mem_map(&mm_free);
+}
+
+void print_mem_map(mp_t *entry){
+  while(entry->next != NULL){
+    term_writestring(&tty0, "____________________");
+    term_writestring(&tty0, "|");
+    term_writestring(&tty0, itoa(temp->address, 16));
+    term_writestring(&tty0, "-");
+    term_writestring(&tty0, itoa(temp->address + temp->size, 16));
+    term_writestring(&tty0, "|");
+    term_writestring(&tty0, "____________________");
+    entry = entry->next;
+  }
 }
 
 mp_t* malloc(size_t size){
