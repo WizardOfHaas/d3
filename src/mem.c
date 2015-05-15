@@ -1,8 +1,4 @@
-#ifndef TERM_H
-#define TERM_H
 #include "term.h"
-#endif
-
 #include "multiboot.h"
 #include "str.h"
 #include "mem.h"

@@ -1,3 +1,6 @@
+#ifndef TERM_H
+#define TERM_H
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -39,3 +42,5 @@ void term_setcolor(term_t* term, uint8_t color);
 uint8_t make_color(enum vga_color fg, enum vga_color bg);
 void term_putchar(term_t* term, char c);
 void term_writestring(term_t* term, const char* data);
+
+#endif

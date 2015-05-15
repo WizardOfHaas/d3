@@ -6,6 +6,7 @@
 #include "term.h"
 #include "mem.h"
 #include "str.h"
+#include "task.h"
 
 term_t tty0;
 
@@ -29,5 +30,10 @@ void cmain(multiboot_info_t* mbd)
   //Init memory manager and print some stats...
   term_writestring(&tty0, "Initializing memory manager...");
   init_mm(mbd);
+  term_writestring(&tty0, "[OK]\n");  
+
+  //Init task manager...
+  term_writestring(&tty0, "Initializing task manager...");
+  init_tasker();
   term_writestring(&tty0, "[OK]\n");  
 }

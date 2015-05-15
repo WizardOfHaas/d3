@@ -4,6 +4,7 @@
 #include <stddef.h>
 
 #include "multiboot.h"
+#include "term.h"
 
 typedef struct memory_page_tag{
   struct mp_t *prev;
@@ -31,6 +32,7 @@ mp_t* malloc(size_t size);
 void free(mp_t *entry);
 void add_buddy(mp_t* entry, mp_t* new);
 void mem_dump(term_t* term, void* addr, size_t size);
+void print_mem_map();
 
 void init_stack(stack_t* stack);
 void stack_push(stack_t* stack, void* el);
