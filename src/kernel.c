@@ -30,36 +30,4 @@ void cmain(multiboot_info_t* mbd)
   term_writestring(&tty0, "Initializing memory manager...");
   init_mm(mbd);
   term_writestring(&tty0, "[OK]\n");
-
-  //Test malloc...and free!
-  mp_t *test = malloc(100);
-  term_writestring(&tty0, itoa(test->address, 16));
-  free(test);
-  term_writestring(&tty0, "\n");
-
-  test = malloc(110);
-  term_writestring(&tty0, itoa(test->address, 16));
-  free(test);
-  term_writestring(&tty0, "\n");
-
-  test = malloc(100);
-  term_writestring(&tty0, itoa(test->address, 16));
-  free(test);
-  term_writestring(&tty0, "\n");
-  
-  //List all my free buddies....for debugging
-  mp_t *temp = &mm_free;
-  
-  while(temp->next != NULL){
-    term_writestring(&tty0, "\n@");
-    term_writestring(&tty0, itoa(temp, 16));
-    term_writestring(&tty0, ":");
-    term_writestring(&tty0, itoa(temp->size, 10));
-    temp = temp->next;
-  }
-
-  term_writestring(&tty0, "\n@");
-  term_writestring(&tty0, itoa(temp->address, 16));
-  term_writestring(&tty0, ":");
-  term_writestring(&tty0, itoa(temp->size, 10));
 }

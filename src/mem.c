@@ -83,9 +83,8 @@ void init_mm(multiboot_info_t* mbd){
     kernel_panic("init_mm: Rats! Not enough free memory!");
   }
 
-  mp_t test;
-  test.size = 1024;
-  add_mm_list_entry(&mm_free, &test);
+  mp_t *test = malloc(1024);
+  free(test);
 }
 
 mp_t* malloc(size_t size){
@@ -93,7 +92,7 @@ mp_t* malloc(size_t size){
   mp_t *largest = &mm_free;
   while(temp->next != NULL){
     //Is the buddy within spec?
-    if(temp->size >= size && temp->size <= (size * 2)){
+    if(temp->size >= size && temp->size <= (size * 1.25)){
       //Its a fit! Record that this is in use.
       remove_mm_list_entry(temp);
       add_mm_list_entry(&mm_used, temp);
@@ -105,7 +104,7 @@ mp_t* malloc(size_t size){
     if(temp->size > largest->size){
       largest = temp;
     }
-   
+    
     temp = temp->next;
   }
 
