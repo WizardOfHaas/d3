@@ -85,21 +85,33 @@ void init_mm(multiboot_info_t* mbd){
 
   mp_t *test = malloc(1024);
   free(test);
-
-  print_mem_map(&mm_free);
 }
 
-void print_mem_map(mp_t *entry){
+void print_mem_map(){
+  mp_t *entry = &mm_free;
   while(entry->next != NULL){
-    term_writestring(&tty0, "____________________");
-    term_writestring(&tty0, "|");
-    term_writestring(&tty0, itoa(temp->address, 16));
+    term_writestring(&tty0, "\n    ");
+    term_writestring(&tty0, itoa(entry->size, 10));
+    term_writestring(&tty0, "  0x");
+    term_writestring(&tty0, itoa(entry->address, 16));
     term_writestring(&tty0, "-");
-    term_writestring(&tty0, itoa(temp->address + temp->size, 16));
-    term_writestring(&tty0, "|");
-    term_writestring(&tty0, "____________________");
+    term_writestring(&tty0, itoa(entry->address + entry->size, 16));
+    term_writestring(&tty0, "[FREE]");
     entry = entry->next;
   }
+
+  entry = &mm_used;
+  while(entry->next != NULL){
+    term_writestring(&tty0, "\n    ");
+    term_writestring(&tty0, itoa(entry->size, 10));
+    term_writestring(&tty0, "  0x");
+    term_writestring(&tty0, itoa(entry->address, 16));
+    term_writestring(&tty0, "-");
+    term_writestring(&tty0, itoa(entry->address + entry->size, 16));
+    term_writestring(&tty0, "[USED]");
+    entry = entry->next;
+  }
+  term_writestring(&tty0, "\n");
 }
 
 mp_t* malloc(size_t size){
