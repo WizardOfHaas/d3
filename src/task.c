@@ -5,14 +5,33 @@
 
 task_que_t task_que;
 
+int A = 0;
+int B = 0;
+
 int test_task_A(proc_t *self){
-  term_writestring(&tty0, "A");
-  task_yield(self);
+  term_writestring(&tty0, "\nA: ");
+  term_writestring(&tty0, itoa(A));
+
+  A++;
+
+  if(A >= 5){
+    task_deinit(self);
+  }else{
+    task_yield(self);
+  }
 }
 
 int test_task_B(proc_t *self){
-  term_writestring(&tty0, "B");
-  task_yield(self);
+  term_writestring(&tty0, "\nB: ");
+  term_writestring(&tty0, itoa(B));
+
+  B++;
+
+  if(B >= 2){
+    task_deinit(self);
+  }else{
+    task_yield(self);
+  }
 }
 
 void init_tasker(){
@@ -21,10 +40,15 @@ void init_tasker(){
   task_que.tail = NULL;
 
   proc_t testA, testB;
+
   init_task(&testA, "test_A", test_task_A, NULL, NULL, NULL, NULL);
   init_task(&testB, "test_B", test_task_B, NULL, NULL, NULL, NULL);
+
   task_schedule(&testA);
   task_schedule(&testB);
+
+  //task_run(&testA);
+  testA.main(&testA);
 }
 
 //Fill out proc_t and setup needed data/heap/stuff
@@ -77,7 +101,7 @@ void task_schedule(proc_t *proc){
     task_que.tail->next = proc;
     task_que.tail = proc;
   }
-  
+
   task_que.tasks++;
 }
 

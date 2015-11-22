@@ -1,5 +1,6 @@
 all:
 	~/opt/cross/bin/i686-elf-as ./boot.S -o boot.o
+	~/opt/cross/bin/i686-elf-as ./switch.S -o switch.o
 	~/opt/cross/bin/i686-elf-gcc -c \
 		./kernel.c \
 		./mem.c \
@@ -14,6 +15,7 @@ all:
 		term.o \
 		str.o \
 		task.o \
+		switch.o \
 		-lgcc
 
 clean:

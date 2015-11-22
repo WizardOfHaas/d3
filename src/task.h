@@ -48,5 +48,6 @@ typedef struct task_que_tag{
 }task_que_t;
 
 void init_tasker();
+extern void switchTask(registers *old, registers *new);
 
 #endif
