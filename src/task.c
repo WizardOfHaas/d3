@@ -9,7 +9,7 @@ int A = 0;
 int B = 0;
 
 int test_task_A(proc_t *self){
-  term_writestring(&tty0, "\nA: ");
+  term_writestring(&tty0, self->name);
   term_writestring(&tty0, itoa(A));
 
   A++;
@@ -17,12 +17,12 @@ int test_task_A(proc_t *self){
   if(A >= 5){
     task_deinit(self);
   }else{
-    task_yield(self);
+    //task_yield(self);
   }
 }
 
 int test_task_B(proc_t *self){
-  term_writestring(&tty0, "\nB: ");
+  term_writestring(&tty0, self->name);
   term_writestring(&tty0, itoa(B));
 
   B++;
@@ -30,7 +30,7 @@ int test_task_B(proc_t *self){
   if(B >= 2){
     task_deinit(self);
   }else{
-    task_yield(self);
+    //task_yield(self);
   }
 }
 
@@ -41,14 +41,16 @@ void init_tasker(){
 
   proc_t testA, testB;
 
-  init_task(&testA, "test_A", test_task_A, NULL, NULL, NULL, NULL);
-  init_task(&testB, "test_B", test_task_B, NULL, NULL, NULL, NULL);
+  init_task(&testA, "\nTask A: ", test_task_A, NULL, NULL, NULL, NULL);
+  init_task(&testB, "\nTask B: ", test_task_B, NULL, NULL, NULL, NULL);
 
   task_schedule(&testA);
   task_schedule(&testB);
+}
 
-  //task_run(&testA);
-  testA.main(&testA);
+//Run all tasks in que
+void run_que(){
+
 }
 
 //Fill out proc_t and setup needed data/heap/stuff
