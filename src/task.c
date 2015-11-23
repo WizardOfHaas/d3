@@ -6,29 +6,27 @@
 task_que_t task_que;
 
 int A = 0;
-int B = 0;
+int B = 5;
 
 int test_task_A(proc_t *self){
-  term_writestring(&tty0, self->name);
   term_writestring(&tty0, itoa(A));
 
   A++;
 
   if(A >= 5){
-    task_deinit(self);
+    self->status = DONE;
   }else{
     //task_yield(self);
   }
 }
 
 int test_task_B(proc_t *self){
-  term_writestring(&tty0, self->name);
   term_writestring(&tty0, itoa(B));
 
   B++;
 
-  if(B >= 2){
-    task_deinit(self);
+  if(B >= 8){
+    self->status = DONE;
   }else{
     //task_yield(self);
   }
@@ -46,11 +44,27 @@ void init_tasker(){
 
   task_schedule(&testA);
   task_schedule(&testB);
+
+  run_que();
 }
 
 //Run all tasks in que
 void run_que(){
+  proc_t *current = task_que.head;
 
+  while(current->next != NULL){
+    term_writestring(&tty0, current->name);
+    task_run(current);
+
+    //Some termination weirdness...
+
+    if(current->status == DONE){
+      current = current->next;
+      task_kill(current->prev);
+    }else{
+      current = current->next;
+    }
+  }
 }
 
 //Fill out proc_t and setup needed data/heap/stuff
@@ -137,6 +151,21 @@ void task_deinit(proc_t *proc){
   free(proc->ctx);
 
   proc->status = DONE;
+}
+
+void task_kill(proc_t *proc){
+  if(proc->status != DONE){
+    task_deinit(proc);
+  }
+
+  proc_t *prev = proc->prev;
+  proc_t *next = proc->next;
+
+  prev->next = next;
+  next->prev = prev;
+
+  proc->next = NULL;
+  proc->prev = NULL;
 }
 
 void task_yield(proc_t *proc){
