@@ -8,6 +8,7 @@
 #include "str.h"
 #include "task.h"
 #include "vm.h"
+#include "vm_ops.h"
 
 term_t tty0;
 

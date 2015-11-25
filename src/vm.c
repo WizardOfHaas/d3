@@ -1,18 +1,25 @@
 #include "mem.h"
 #include "vm.h"
+#include "vm_ops.h"
 
-int vm_last_id = 0;
+vm_pool main_vm_pool;
 
 void init_vmm(){
-	vm_t test_vm;
+	main_vm_pool.name = "Main VM Pool";
+	main_vm_pool.next_vm_slot = 0;
 
-	create_vm(test_vm, "Test VM");
+	vm_t test_vm;
+	vm_init(test_vm, "Test VM");
+	vm_add_to_pool(&main_vm_pool, &test_vm);
 }
 
-void create_vm(vm_t *machine, char *name){
+void vm_init(vm_t *machine, char *name){
 	machine->name = name;
-
 	machine->heap = malloc(1024);
+	machine->status = VM_READY;
+}
 
-	machine->state = VM_READY;	
+void vm_add_to_pool(vm_pool *pool, vm_t *machine){
+	pool->machines[pool->next_vm_slot] = machine;
+	pool->next_vm_slot++;
 }

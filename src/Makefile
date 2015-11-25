@@ -8,6 +8,7 @@ all:
 		./str.c \
 		./task.c \
 		./vm.c \
+		./vm_ops.c \
 		 -std=gnu99 -ffreestanding -O2 -Wfatal-errors -w
 	~/opt/cross/bin/i686-elf-gcc -T linker.ld -o d3.kernel -ffreestanding -O2 -nostdlib \
 		boot.o \
@@ -18,6 +19,7 @@ all:
 		task.o \
 		switch.o \
 		vm.o \
+		vm_ops.o \
 		-lgcc
 
 clean:
