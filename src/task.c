@@ -5,31 +5,28 @@
 
 task_que_t task_que;
 
-int A = 0;
-int B = 5;
-
 int test_task_A(proc_t *self){
-  term_writestring(&tty0, itoa(A));
+  for(int i = 0; i< 5; i++){
+    term_writestring(&tty0, "\n");
+    term_writestring(&tty0, self->name);
+    term_writestring(&tty0, itoa(i));
 
-  A++;
-
-  if(A >= 5){
-    self->status = DONE;
-  }else{
-    //task_yield(self);
+    task_yield(self);
   }
+
+  task_kill(self);
 }
 
 int test_task_B(proc_t *self){
-  term_writestring(&tty0, itoa(B));
+  for(int i = 0; i< 5; i++){
+    term_writestring(&tty0, "\n");
+    term_writestring(&tty0, self->name);
+    term_writestring(&tty0, itoa(i));
 
-  B++;
-
-  if(B >= 8){
-    self->status = DONE;
-  }else{
-    //task_yield(self);
+    task_yield(self);
   }
+
+  task_kill(self);
 }
 
 void init_tasker(){
@@ -39,13 +36,14 @@ void init_tasker(){
 
   proc_t testA, testB;
 
-  init_task(&testA, "\nTask A: ", test_task_A, NULL, NULL, NULL, NULL);
-  init_task(&testB, "\nTask B: ", test_task_B, NULL, NULL, NULL, NULL);
+  init_task(&testA, "Task A", test_task_A, NULL, NULL, NULL, NULL);
+  init_task(&testB, "Task B", test_task_B, NULL, NULL, NULL, NULL);
 
   task_schedule(&testA);
   task_schedule(&testB);
 
-  run_que();
+  //run_que();
+  //ask_run(&testA);
 }
 
 //Run all tasks in que
@@ -175,6 +173,17 @@ void task_yield(proc_t *proc){
     proc->yield(proc);
   }
 
-  task_run(proc->next);
+  //task_run(proc->next);
+  //DO CONTEXT SWITCH....HERE....
+  proc_t *next = proc->next;
+  switchTask(proc->ctx, next->ctx);
   proc->status = READY;
+}
+
+void task_log_status(proc_t *proc){
+  term_writestring(&tty0, "\n");
+  term_writestring(&tty0, proc->name);
+  term_writestring(&tty0, ":");
+  term_writestring(&tty0, proc_status_names[proc->status]);
+  term_writestring(&tty0, "\n");
 }

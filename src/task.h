@@ -15,6 +15,16 @@ enum proc_status{
   READY
 };
 
+static char* proc_status_names[] = {
+  "SCHEDULE",
+  "RUNNING",
+  "YIELDING",
+  "DONE",
+  "INIT",
+  "DEINIT",
+  "READY"
+};
+
 typedef struct {
   uint32_t eax, ebx, ecx, edx, esi, edi, esp, ebp, eip, eflags, cr3;
 }registers;

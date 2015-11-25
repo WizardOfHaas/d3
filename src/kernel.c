@@ -7,6 +7,7 @@
 #include "mem.h"
 #include "str.h"
 #include "task.h"
+#include "vm.h"
 
 term_t tty0;
 
@@ -35,5 +36,10 @@ void cmain(multiboot_info_t* mbd)
   //Init task manager...
   term_writestring(&tty0, "Initializing task manager...");
   init_tasker();
+  term_writestring(&tty0, "[OK]\n");
+
+  //Init vm manager...
+  term_writestring(&tty0, "Initializing vm manager...");
+  init_vmm();
   term_writestring(&tty0, "[OK]\n");
 }
