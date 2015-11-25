@@ -15,6 +15,12 @@ enum vm_status{
 	VM_DONE
 };
 
+static char* vm_status_names[] = {
+  "READY",
+  "RUN",
+  "DONE"
+};
+
 typedef struct vm_tag{
 	char *name;
 	int id;
@@ -31,5 +37,6 @@ typedef struct vm_pool_tag{
 }vm_pool;
 
 void init_vmm();
+char *vm_get_instuction(vm_t *machine);
 
 #endif

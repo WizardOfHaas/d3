@@ -16,7 +16,7 @@ uint64_t mm_heap_size = sizeof(mp_t)*256;
 
 int mem_size;
 
-void* movemem(void* dstptr, const void* srcptr, size_t size){
+void* mem_cpy(void* dstptr, const void* srcptr, size_t size){
   /*Move data at &srcpty to &dstptr.
     No garuntee of what lies at &srcptr when done.    
     Safe if &srcptr and &dstprt are close together.*/
@@ -189,6 +189,7 @@ void* stack_pop(stack_t* stack){
 }
 
 void mem_dump(term_t* term, void* addr, size_t size){
+  term_writestring(term, "\n");
   unsigned char* data = (unsigned char*) addr;
   size_t i = 0;
     

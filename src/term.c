@@ -48,7 +48,7 @@ void term_clear(term_t* term, char c){
 }
 
 void term_scroll(term_t* term){
-  movemem(term->buffer, term->buffer + term->width, term->width*term->height*2);
+  mem_cpy(term->buffer, term->buffer + term->width, term->width*term->height*2);
 }
  
 void term_setcolor(term_t* term, uint8_t color)
