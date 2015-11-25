@@ -10,5 +10,9 @@ void init_vmm(){
 }
 
 void create_vm(vm_t *machine, char *name){
-	
+	machine->name = name;
+
+	machine->heap = malloc(1024);
+
+	machine->state = VM_READY;	
 }

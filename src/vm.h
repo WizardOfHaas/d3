@@ -6,6 +6,7 @@ typedef struct vm_registers_tag{
 }vm_regs_t;
 
 enum vm_status{
+	VM_READY,
 	VM_RUN,
 	VM_DONE
 };
