@@ -24,7 +24,7 @@ void init_vmm(){
 		};
 	vm_copy_to_heap(&test_vm, 0, &test_data, 16);
 
-	mem_dump(&tty0, vm_get_instuction(&test_vm), 16);
+	mem_dump(&tty0, test_vm.heap->address, 16);
 
 	//Try to run test_vm
 	//vm_run_op(&test_vm);
@@ -49,15 +49,15 @@ void vm_load_heap(vm_t *machine, mp_t *heap){
 void vm_copy_to_heap(vm_t *machine, int address, void *data, size_t size){
 	unsigned char *dest = (unsigned char*)machine->heap->address;
 
-	//Not copying data to correct place?
-	mem_dump(&tty0, dest, 16);
-	
 	mem_cpy(
-		dest[address],
+		&dest[address],
 		data, size);
+
+	mem_dump(&tty0, &dest[address], 16);
 }
 
 char *vm_get_instuction(vm_t *machine){
+	//This... this is wrong...
 	return (int(*)[8])(machine->heap + machine->registers.ip);
 }
 
