@@ -92,7 +92,7 @@ void print_mem_map(){
     term_writestring(&tty0, itoa(entry->address, 16));
     term_writestring(&tty0, "-");
     term_writestring(&tty0, itoa(entry->address + entry->size, 16));
-    term_writestring(&tty0, "[FREE]");
+    term_writestring(&tty0, "  [FREE]");
     entry = entry->next;
   }
 
@@ -104,7 +104,7 @@ void print_mem_map(){
     term_writestring(&tty0, itoa(entry->address, 16));
     term_writestring(&tty0, "-");
     term_writestring(&tty0, itoa(entry->address + entry->size, 16));
-    term_writestring(&tty0, "[USED]");
+    term_writestring(&tty0, "  [USED]");
     entry = entry->next;
   }
   term_writestring(&tty0, "\n");

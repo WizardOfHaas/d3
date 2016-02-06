@@ -6,7 +6,7 @@
 #include "mem.h"
 
 typedef struct vm_registers_tag{
-	uint32_t ip, sp, bp, as, bx, cx, dx, si, di, flags;
+	uint32_t ip, sp, bp, r0, r1, r2, r3, flags;
 }vm_regs_t;
 
 enum vm_status{
