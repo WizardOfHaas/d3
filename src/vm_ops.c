@@ -16,18 +16,18 @@ void vm_op_register(vm_op *vm_ops[], vm_op *op, int opcode){
 }
 
 void vm_run_op(vm_t *machine){
-	int *instruction = vm_get_instuction(machine);
-	mem_dump(&tty0, instruction, 8);
+	unsigned char *ins = (unsigned char*) vm_get_instuction(machine);
+	vm_ops[ins[1]].op(machine, ins);
 }
 
-int op_halt(vm_t *machine){
+int op_halt(vm_t *machine, char *instruction){
 	machine->status = VM_DONE;
 
 	return 0;
 }
 
-int op_mov(vm_t *machine){
-	int *instruction = vm_get_instuction(machine);
+int op_mov(vm_t *machine, char *instruction){
+	term_writestring(&tty0, "MOV\n");
 
 	return 0;
 }

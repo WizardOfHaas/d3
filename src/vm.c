@@ -7,6 +7,9 @@
 vm_pool main_vm_pool;
 
 void init_vmm(){
+	//Init default VM optcode table
+	vm_ops_init();
+
 	main_vm_pool.name = "Main VM Pool";
 	main_vm_pool.next_vm_slot = 0;
 
@@ -20,7 +23,7 @@ void init_vmm(){
 	//Lets add some data to the heap...
 	char test_data[16] = {
 			0, 1, 2, 3, 4, 5, 6, 7,
-			0, 0, 0, 0, 0, 0, 0, 0
+			8, 9, 0, 1, 2, 3, 4, 5
 		};
 	vm_copy_to_heap(&test_vm, 0, &test_data, 16);
 
@@ -63,11 +66,13 @@ char *vm_get_instuction(vm_t *machine){
 	uint32_t *heap = (uint32_t)machine->heap->address;
 	uint32_t ip = machine->registers.ip;
 
+	//mask,op,mask,val,mask,val,mask,val//
+
 	return (char(*)[8])(heap + ip);
 }
 
 void vm_run(vm_t *machine){
-
+	vm_run_op(machine);
 }
 
 void vm_dump_registers(term_t *term, vm_t *machine){
