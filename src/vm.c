@@ -66,7 +66,8 @@ char *vm_get_instuction(vm_t *machine){
 	uint32_t *heap = (uint32_t)machine->heap->address;
 	uint32_t ip = machine->registers.ip;
 
-	//mask,op,mask,val,mask,val,mask,val//
+	//mask,op,mask,val,mask,val
+	//1,   1, 1    2,  1,   2    <--bytes
 
 	return (char(*)[8])(heap + ip);
 }
@@ -93,4 +94,16 @@ void vm_dump_registers(term_t *term, vm_t *machine){
 	term_writestring(term, itoa(machine->registers.r3));
 
 	term_writestring(term, "\n");
+}
+
+void vm_write(vm_t *machine, vm_op_mask mask, unsigned int v0, unsigned int v1){
+
+}
+
+void *vm_read(vm_t *machine, vm_op_mask mask, unsigned int v0){
+
+}
+
+void *vm_parse_ins(vm_t *machine){
+
 }

@@ -15,6 +15,15 @@ enum vm_status{
 	VM_DONE
 };
 
+typedef enum{
+	NONE,
+	OPCODE,
+	VALUE,
+	REGISTER,
+	VALUE_POINTER,
+	REGISTER_POINTER
+}vm_op_mask;
+
 static char* vm_status_names[] = {
   "READY",
   "RUN",
@@ -38,5 +47,8 @@ typedef struct vm_pool_tag{
 
 void init_vmm();
 char *vm_get_instuction(vm_t *machine);
+void vm_write(vm_t *machine, vm_op_mask mask, unsigned int v0, unsigned int v1);
+void *vm_read(vm_t *machine, vm_op_mask mask, unsigned int v0);
+void *vm_parse_ins(vm_t *machine);
 
 #endif
