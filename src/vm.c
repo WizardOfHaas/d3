@@ -24,8 +24,8 @@ void init_vmm(){
 	vm_ins test_ins;
 	test_ins.op_mask = 0;
 	test_ins.op = 2;
-	test_ins.arg0_mask = 1;
-	test_ins.arg0 = 20;
+	test_ins.arg0_mask = 3;
+	test_ins.arg0 = 1;
 	test_ins.arg1_mask = 0;
 	test_ins.arg1 = 6;
 
@@ -34,10 +34,8 @@ void init_vmm(){
 		6, 6, 6, 6
 	};
 
-	vm_copy_to_heap(&test_vm, 0, &test_ins, 16);
-	vm_copy_to_heap(&test_vm, 16, &test_data, 16);
-
-	mem_dump(&tty0, &test_vm.heap->address, 32);
+	vm_copy_to_heap(&test_vm, 0, &test_ins, 8);
+	vm_copy_to_heap(&test_vm, 8, &test_data, 16);
 
 	//Try to run test_vm
 	vm_run_op(&test_vm);
@@ -49,7 +47,7 @@ void vm_init(vm_t *machine, char *name){
 	machine->registers.ip = 0;
 	machine->registers.sp = 0;
 	machine->registers.bp = 0;
-	machine->registers.r0 = 0;
+	machine->registers.r0 = 8;
 	machine->registers.r1 = 1;
 	machine->registers.r2 = 2;
 	machine->registers.r3 = 3;
@@ -68,8 +66,10 @@ void vm_load_heap(vm_t *machine, mp_t *heap){
 void vm_copy_to_heap(vm_t *machine, int address, void *data, size_t size){
 	unsigned char *dest = (unsigned char*)machine->heap->address;
 
+	dest += address;
+
 	mem_cpy(
-		&dest[address],
+		dest,
 		data, size
 	);
 }
@@ -115,16 +115,20 @@ void vm_write(vm_t *machine, vm_ins *ins){
 short vm_read(vm_t *machine, char mask0, short arg0){
 	short val = 0;
 
-	if(mask0 == 0){
+	if(mask0 == 0){ //Raw value
 		val = arg0;	
-	}else if(mask0 == 1){
+	}else if(mask0 == 1){ //Register value
 		unsigned char* regs = (unsigned char*) &machine->registers;
 		val = (short) regs[2 * arg0];
-	}else if(mask0 == 2){
+	}else if(mask0 == 2){ //Raw pointer
 		unsigned char* heap = (unsigned char*) &machine->heap;
-		val = (short) heap[arg0];
-	}else if (mask0 == 3){
-
+		mem_dump(&tty0, heap, 16);
+		val = (short) heap[arg0 + machine->registers.bp];
+	}else if (mask0 == 3){ //Register pointer
+		unsigned char* regs = (unsigned char*) &machine->registers;
+		unsigned char* heap = (unsigned char*) &machine->heap;
+		short p = (short) regs[2 * arg0];
+		val = (short) heap[p+ machine->registers.bp];
 	}
 
 	return val;
