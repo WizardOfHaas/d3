@@ -38,14 +38,42 @@ while(<$src>){
 			my $op_code = $op_codes->{$op};
 			
 			#Parse args, little more challenging
-			my ($m0, $a0, $m1, $a1);
-			if($arg0){
+			my ($m0, $a0, $m1, $a1) = (0, 0, 0, 0);
+
+			if($arg0){ #Parse arg0, if exists
 				if($arg0 =~ m/^[0-9]+$/){
+					$m0 = 0;
 					$a0 = $arg0;
 				}elsif($arg0 =~ m/^(R0|R1|R2|R3|IP|SP|BP)$/){
+					$m0 = 1;
 					$a0 = $regs->{$arg0};
+				}elsif($arg0 =~ m/^\[([0-9]+)\]$/){
+					$m0 = 2;
+					$a0 = $1;
+				}elsif($arg0 =~ m/^\[(R0|R1|R2|R3|IP|SP|BP)\]$/){
+					$m0 = 3;
+					$a0 = $regs->{$1};
 				}
 			}
+
+			if($arg1){ #Parse arg1, if exists
+        if($arg1 =~ m/^[0-9]+$/){
+          $m1 = 0;
+          $a1 = $arg1;
+        }elsif($arg1 =~ m/^(R0|R1|R2|R3|IP|SP|BP)$/){
+          $m1 = 1;
+          $a1 = $regs->{$arg1};
+        }elsif($arg1 =~ m/^\[([0-9]+)\]$/){
+          $m1 = 2;
+          $a1 = $1;
+        }elsif($arg1 =~ m/^\[(R0|R1|R2|R3|IP|SP|BP)\]$/){
+          $m1 = 3;
+          $a1 = $regs->{$1};
+        }
+      }
+		
+			#Put it all together
+			print("0".$op_code.$m0."0".$a0."0".$m1."0",$a1."0\n");
 		}
 	}
 }
