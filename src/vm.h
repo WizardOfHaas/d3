@@ -59,7 +59,7 @@ typedef struct vm_ins_tag{
 void init_vmm();
 vm_ins *vm_get_instuction(vm_t *machine);
 void vm_write(vm_t *machine, vm_ins *ins);
-void *vm_read(vm_t *machine, char mask0, short arg0);
+short vm_read(vm_t *machine, char mask0, short arg0);
 void *vm_parse_ins(vm_t *machine);
 
 #endif

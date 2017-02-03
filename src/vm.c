@@ -25,7 +25,7 @@ void init_vmm(){
 	test_ins.op_mask = 0;
 	test_ins.op = 2;
 	test_ins.arg0_mask = 1;
-	test_ins.arg0 = 1;
+	test_ins.arg0 = 2;
 	test_ins.arg1_mask = 0;
 	test_ins.arg1 = 6;
 
@@ -43,7 +43,7 @@ void vm_init(vm_t *machine, char *name){
 	machine->registers.bp = 0;
 	machine->registers.r0 = 0;
 	machine->registers.r1 = 1;
-	machine->registers.r2 = 2;
+	machine->registers.r2 = 4;
 	machine->registers.r3 = 3;
 	machine->status = VM_READY;
 }
@@ -104,14 +104,14 @@ void vm_write(vm_t *machine, vm_ins *ins){
 
 }
 
-void *vm_read(vm_t *machine, char mask0, short arg0){
-	void* val;
+short vm_read(vm_t *machine, char mask0, short arg0){
+	short val = 0;
 
 	if(mask0 == 0){
-		val = &arg0;
+		val = arg0;	
 	}else if(mask0 == 1){
 		unsigned char* regs = (unsigned char*) &machine->registers;
-		val = &regs[2 * arg0];
+		val = (short) regs[2 * arg0];
 	}else if(mask0 == 2){
 
 	}else if (mask0 == 3){

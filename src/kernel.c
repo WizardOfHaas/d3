@@ -43,4 +43,6 @@ void cmain(multiboot_info_t* mbd)
   term_writestring(&tty0, "Initializing vm manager...");
   init_vmm();
   term_writestring(&tty0, "[OK]\n");
+
+  print_mem_map();
 }

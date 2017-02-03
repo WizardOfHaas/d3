@@ -37,10 +37,9 @@ int op_mov(vm_t *machine, vm_ins *instruction){
 int op_push(vm_t *machine, vm_ins *instruction){
 	unsigned char* heap = (unsigned char*) machine->heap->address;
 
-	short arg0 = *(short*) vm_read(machine, instruction->arg0_mask, instruction->arg0);
-	term_writestring(&tty0, itoa(arg0));
-	//mem_dump(&tty0, &arg0, 16);
-
+	short arg0 = vm_read(machine, instruction->arg0_mask, instruction->arg0);
+	mem_dump(&tty0, &arg0, 2);
+	
 	return 0;
 }
 
