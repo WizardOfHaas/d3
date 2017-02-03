@@ -25,11 +25,19 @@ void init_vmm(){
 	test_ins.op_mask = 0;
 	test_ins.op = 2;
 	test_ins.arg0_mask = 1;
-	test_ins.arg0 = 1;
+	test_ins.arg0 = 20;
 	test_ins.arg1_mask = 0;
 	test_ins.arg1 = 6;
 
+	short test_data[16] = {
+		6, 6, 6, 6,
+		6, 6, 6, 6
+	};
+
 	vm_copy_to_heap(&test_vm, 0, &test_ins, 16);
+	vm_copy_to_heap(&test_vm, 16, &test_data, 16);
+
+	mem_dump(&tty0, &test_vm.heap->address, 32);
 
 	//Try to run test_vm
 	vm_run_op(&test_vm);
