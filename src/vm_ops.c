@@ -30,12 +30,8 @@ int op_halt(vm_t *machine, vm_ins *instruction){
 }
 
 int op_mov(vm_t *machine, vm_ins *instruction){
-	mem_dump(&tty0, instruction, 16);
-
 	short val = vm_read(machine, instruction->arg1_mask, instruction->arg1);
 	vm_write(machine, instruction->arg0_mask, instruction->arg0, val);
-
-	vm_dump_registers(&tty0, machine);
 
 	return 0;
 }

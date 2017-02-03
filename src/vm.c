@@ -21,24 +21,27 @@ void init_vmm(){
 	vm_add_to_pool(&main_vm_pool, &test_vm);
 
 	//Lets add some data to the heap...
+	/*
+	Example of building instruction as a struct...
 	vm_ins test_ins;
 	test_ins.op_mask = 0;
 	test_ins.op = 1;
-	test_ins.arg0_mask = 3;
-	test_ins.arg0 = 3;
+	test_ins.arg0_mask = 1;
+	test_ins.arg0 = 0;
 	test_ins.arg1_mask = 1;
-	test_ins.arg1 = 3;
+	test_ins.arg1 = 3;*/
 
-	short test_data[16] = {
-		6, 6, 6, 6,
-		6, 6, 6, 6
+	char test_code[] = {
+		0, 1, 1, 0, 5, 0, 0, 0, 10, 0,
+		0, 2, 0, 0, 15, 0, 0, 0, 0, 0,
+		0, 2, 1, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 	};
 
-	vm_copy_to_heap(&test_vm, 0, &test_ins, 10);
-	vm_copy_to_heap(&test_vm, 10, &test_data, 16);
+	vm_copy_to_heap(&test_vm, 0, &test_code, 20);
 
 	//Try to run test_vm
-	vm_run_op(&test_vm);
+	vm_run(&test_vm);
 }
 
 void vm_init(vm_t *machine, char *name){
@@ -85,7 +88,20 @@ vm_ins *vm_get_instuction(vm_t *machine){
 }
 
 void vm_run(vm_t *machine){
-	vm_run_op(machine);
+	if(machine->status == VM_READY){
+		machine->status = VM_RUN;
+
+		mem_dump(&tty0, machine->heap->address, 32);
+		vm_dump_registers(&tty0, machine);
+
+		while(machine->status == VM_RUN){
+			vm_run_op(machine);
+			machine->registers.ip += 10;
+
+			mem_dump(&tty0, machine->heap->address, 32);
+			vm_dump_registers(&tty0, machine);
+		}
+	}
 }
 
 void vm_dump_registers(term_t *term, vm_t *machine){
@@ -122,7 +138,6 @@ void vm_write(vm_t *machine, char mask0, short arg0, short val){
 		unsigned char* heap = (unsigned char*)machine->heap->address;
 		short p = (short) regs[2 * arg0];
 		heap[p + machine->registers.bp] = val;
-		mem_dump(&tty0, heap, 16);
 	}
 }
 
