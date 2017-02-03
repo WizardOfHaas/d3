@@ -1,0 +1,51 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $op_codes = {
+	"HLT" => 0x0,
+	"MOV" => 0x1,
+	"PUSH" => 0x2,
+	"POP" => 0x3
+};
+
+my $regs = {
+	"R0" => 0,
+	"R1" => 1,
+	"R2" => 2,
+	"R3" => 3,
+	"IP" => 4,
+	"SP" => 5,
+	"BP" => 6
+};
+
+open my $src, "<", $ARGV[0] or die $!;
+
+while(<$src>){
+	my $l = $_;
+
+	if($l !~ m/^\;/ ){
+		chomp $l;
+		$l = uc;
+
+		my ($op, $arg0, $arg1) = split(" ", $l);
+		
+		if($op){
+			$arg0 =~ s/\,$// if $arg0;
+
+			#Parse op, EZ-PZ
+			my $op_code = $op_codes->{$op};
+			
+			#Parse args, little more challenging
+			my ($m0, $a0, $m1, $a1);
+			if($arg0){
+				if($arg0 =~ m/^[0-9]+$/){
+					$a0 = $arg0;
+				}elsif($arg0 =~ m/^(R0|R1|R2|R3|IP|SP|BP)$/){
+					$a0 = $regs->{$arg0};
+				}
+			}
+		}
+	}
+}
