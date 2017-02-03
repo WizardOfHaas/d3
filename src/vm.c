@@ -21,11 +21,15 @@ void init_vmm(){
 	vm_add_to_pool(&main_vm_pool, &test_vm);
 
 	//Lets add some data to the heap...
-	char test_data[16] = {
-			0, 1, 2, 3, 4, 5, 6, 7,
-			8, 9, 0, 1, 2, 3, 4, 5
-		};
-	vm_copy_to_heap(&test_vm, 0, &test_data, 16);
+	vm_ins test_ins;
+	test_ins.op_mask = 0;
+	test_ins.op = 2;
+	test_ins.arg0_mask = 0;
+	test_ins.arg0 = 4;
+	test_ins.arg1_mask = 0;
+	test_ins.arg1 = 6;
+
+	vm_copy_to_heap(&test_vm, 0, &test_ins, 16);
 
 	//Try to run test_vm
 	vm_run_op(&test_vm);
@@ -62,14 +66,14 @@ void vm_copy_to_heap(vm_t *machine, int address, void *data, size_t size){
 	);
 }
 
-char *vm_get_instuction(vm_t *machine){
+vm_ins *vm_get_instuction(vm_t *machine){
 	uint32_t *heap = (uint32_t)machine->heap->address;
 	uint32_t ip = machine->registers.ip;
 
 	//mask,op,mask,val,mask,val
 	//1,   1, 1    2,  1,   2    <--bytes
 
-	return (char(*)[8])(heap + ip);
+	return (vm_ins*)(heap + ip);
 }
 
 void vm_run(vm_t *machine){
@@ -105,5 +109,7 @@ void *vm_read(vm_t *machine, vm_op_mask mask, unsigned int v0){
 }
 
 void *vm_parse_ins(vm_t *machine){
+	unsigned char *ins = (unsigned char*) vm_get_instuction(machine);
+
 
 }

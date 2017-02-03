@@ -45,8 +45,19 @@ typedef struct vm_pool_tag{
 	vm_t *machines[1024];	
 }vm_pool;
 
+typedef struct vm_ins_tag{
+	char op_mask;
+	char op;
+
+	char arg0_mask;
+	short arg0;
+
+	char arg1_mask;
+	short arg1;
+} vm_ins;
+
 void init_vmm();
-char *vm_get_instuction(vm_t *machine);
+vm_ins *vm_get_instuction(vm_t *machine);
 void vm_write(vm_t *machine, vm_op_mask mask, unsigned int v0, unsigned int v1);
 void *vm_read(vm_t *machine, vm_op_mask mask, unsigned int v0);
 void *vm_parse_ins(vm_t *machine);
