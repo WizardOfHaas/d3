@@ -30,6 +30,12 @@ int op_halt(vm_t *machine, vm_ins *instruction){
 }
 
 int op_mov(vm_t *machine, vm_ins *instruction){
+	mem_dump(&tty0, instruction, 16);
+
+	short val = vm_read(machine, instruction->arg1_mask, instruction->arg1);
+	vm_write(machine, instruction->arg0_mask, instruction->arg0, val);
+
+	vm_dump_registers(&tty0, machine);
 
 	return 0;
 }
@@ -37,13 +43,21 @@ int op_mov(vm_t *machine, vm_ins *instruction){
 int op_push(vm_t *machine, vm_ins *instruction){
 	unsigned char* heap = (unsigned char*) machine->heap->address;
 
-	short arg0 = vm_read(machine, instruction->arg0_mask, instruction->arg0);
-	mem_dump(&tty0, &arg0, 2);
-	
+	short val = vm_read(machine, instruction->arg0_mask, instruction->arg0);
+
+	heap[machine->registers.sp] = val;
+	machine->registers.sp++;
+
 	return 0;
 }
 
 int op_pop(vm_t *machine, vm_ins *instruction){
+	unsigned char* heap = (unsigned char*) machine->heap->address;
+
+	short val = heap[machine->registers.sp];
+	machine->registers.sp--;
+
+	vm_write(machine, instruction->arg0_mask, instruction->arg0, val);
 
 	return 0;
 }

@@ -23,19 +23,19 @@ void init_vmm(){
 	//Lets add some data to the heap...
 	vm_ins test_ins;
 	test_ins.op_mask = 0;
-	test_ins.op = 2;
-	test_ins.arg0_mask = 3;
-	test_ins.arg0 = 1;
-	test_ins.arg1_mask = 0;
-	test_ins.arg1 = 6;
+	test_ins.op = 1;
+	test_ins.arg0_mask = 1;
+	test_ins.arg0 = 0;
+	test_ins.arg1_mask = 3;
+	test_ins.arg1 = 3;
 
 	short test_data[16] = {
 		6, 6, 6, 6,
 		6, 6, 6, 6
 	};
 
-	vm_copy_to_heap(&test_vm, 0, &test_ins, 8);
-	vm_copy_to_heap(&test_vm, 8, &test_data, 16);
+	vm_copy_to_heap(&test_vm, 0, &test_ins, 10);
+	vm_copy_to_heap(&test_vm, 10, &test_data, 16);
 
 	//Try to run test_vm
 	vm_run_op(&test_vm);
@@ -47,10 +47,10 @@ void vm_init(vm_t *machine, char *name){
 	machine->registers.ip = 0;
 	machine->registers.sp = 0;
 	machine->registers.bp = 0;
-	machine->registers.r0 = 8;
+	machine->registers.r0 = 0;
 	machine->registers.r1 = 1;
 	machine->registers.r2 = 2;
-	machine->registers.r3 = 3;
+	machine->registers.r3 = 10;
 	machine->status = VM_READY;
 }
 
@@ -108,8 +108,22 @@ void vm_dump_registers(term_t *term, vm_t *machine){
 	term_writestring(term, "\n");
 }
 
-void vm_write(vm_t *machine, vm_ins *ins){
-
+void vm_write(vm_t *machine, char mask0, short arg0, short val){
+	if(mask0 == 0){ //Raw value
+		//Makes no sence in this context!
+	}else if(mask0 == 1){ //Register value
+		unsigned char* regs = (unsigned char*) &machine->registers;
+		regs[2 * arg0] = val;
+	}else if(mask0 == 2){ //Raw pointer
+		unsigned char* heap = (unsigned char*) &machine->heap;
+		mem_dump(&tty0, heap, 16);
+		val = (short) heap[arg0 + machine->registers.bp];
+	}else if (mask0 == 3){ //Register pointer
+		unsigned char* regs = (unsigned char*) &machine->registers;
+		unsigned char* heap = (unsigned char*) &machine->heap;
+		short p = (short) regs[2 * arg0];
+		val = (short) heap[p+ machine->registers.bp];
+	}
 }
 
 short vm_read(vm_t *machine, char mask0, short arg0){
