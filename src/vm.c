@@ -24,8 +24,8 @@ void init_vmm(){
 	vm_ins test_ins;
 	test_ins.op_mask = 0;
 	test_ins.op = 1;
-	test_ins.arg0_mask = 1;
-	test_ins.arg0 = 0;
+	test_ins.arg0_mask = 2;
+	test_ins.arg0 = 10;
 	test_ins.arg1_mask = 3;
 	test_ins.arg1 = 3;
 
@@ -117,12 +117,12 @@ void vm_write(vm_t *machine, char mask0, short arg0, short val){
 	}else if(mask0 == 2){ //Raw pointer
 		unsigned char* heap = (unsigned char*) &machine->heap;
 		mem_dump(&tty0, heap, 16);
-		val = (short) heap[arg0 + machine->registers.bp];
+		heap[arg0 + machine->registers.bp] = val;
 	}else if (mask0 == 3){ //Register pointer
 		unsigned char* regs = (unsigned char*) &machine->registers;
 		unsigned char* heap = (unsigned char*) &machine->heap;
 		short p = (short) regs[2 * arg0];
-		val = (short) heap[p+ machine->registers.bp];
+		heap[p + machine->registers.bp] = val;
 	}
 }
 
@@ -142,7 +142,7 @@ short vm_read(vm_t *machine, char mask0, short arg0){
 		unsigned char* regs = (unsigned char*) &machine->registers;
 		unsigned char* heap = (unsigned char*) &machine->heap;
 		short p = (short) regs[2 * arg0];
-		val = (short) heap[p+ machine->registers.bp];
+		val = (short) heap[p + machine->registers.bp];
 	}
 
 	return val;
