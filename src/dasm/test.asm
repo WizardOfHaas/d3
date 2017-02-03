@@ -1,5 +1,4 @@
 ;simple tests
-hlt
 push 6
 pop r0
 
@@ -11,3 +10,6 @@ mov [0], 3
 ;Test mov from
 mov r2, [r3]
 mov sp, [0]
+
+;End it
+hlt

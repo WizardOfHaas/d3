@@ -21,6 +21,7 @@ my $regs = {
 };
 
 open my $src, "<", $ARGV[0] or die $!;
+open(my $out, '>:raw', 'out.d3') or die "Unable to open: $!";
 
 while(<$src>){
 	my $l = $_;
@@ -73,7 +74,9 @@ while(<$src>){
       }
 		
 			#Put it all together
-			print("0".$op_code.$m0."0".$a0."0".$m1."0",$a1."0\n");
+			#print("0".$op_code.$m0."0".$a0."0".$m1."0",$a1."0\n");
+			my $ins = pack("cccS<cS<", $op_code, $m0, $a0, $m1, $a1);
+			print $out $ins;
 		}
 	}
 }
