@@ -18,30 +18,33 @@ void vm_op_register(vm_op *vm_ops[], vm_op *op, int opcode){
 }
 
 void vm_run_op(vm_t *machine){
-	unsigned char *ins = (unsigned char*) vm_get_instuction(machine);
-	vm_ops[ins[1]].op(machine, ins);
+	//unsigned char *ins = (unsigned char*) vm_get_instuction(machine);
+	vm_ins* ins = vm_get_instuction(machine);
+	vm_ops[ins->op].op(machine, ins);
 }
 
-int op_halt(vm_t *machine, char *instruction){
+int op_halt(vm_t *machine, vm_ins *instruction){
 	machine->status = VM_DONE;
 
 	return 0;
 }
 
-int op_mov(vm_t *machine, char *instruction){
+int op_mov(vm_t *machine, vm_ins *instruction){
 
 	return 0;
 }
 
-int op_push(vm_t *machine, char *instruction){
+int op_push(vm_t *machine, vm_ins *instruction){
 	unsigned char* heap = (unsigned char*) machine->heap->address;
-	heap[machine->registers.sp] = instruction[5];
-	mem_dump(&tty0, machine->heap->address, 16);
+
+	short arg0 = *(short*) vm_read(machine, instruction->arg0_mask, instruction->arg0);
+	term_writestring(&tty0, itoa(arg0));
+	//mem_dump(&tty0, &arg0, 16);
 
 	return 0;
 }
 
-int op_pop(vm_t *machine, char *instruction){
+int op_pop(vm_t *machine, vm_ins *instruction){
 
 	return 0;
 }

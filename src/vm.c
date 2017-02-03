@@ -24,8 +24,8 @@ void init_vmm(){
 	vm_ins test_ins;
 	test_ins.op_mask = 0;
 	test_ins.op = 2;
-	test_ins.arg0_mask = 0;
-	test_ins.arg0 = 4;
+	test_ins.arg0_mask = 1;
+	test_ins.arg0 = 1;
 	test_ins.arg1_mask = 0;
 	test_ins.arg1 = 6;
 
@@ -100,12 +100,25 @@ void vm_dump_registers(term_t *term, vm_t *machine){
 	term_writestring(term, "\n");
 }
 
-void vm_write(vm_t *machine, vm_op_mask mask, unsigned int v0, unsigned int v1){
+void vm_write(vm_t *machine, vm_ins *ins){
 
 }
 
-void *vm_read(vm_t *machine, vm_op_mask mask, unsigned int v0){
+void *vm_read(vm_t *machine, char mask0, short arg0){
+	void* val;
 
+	if(mask0 == 0){
+		val = &arg0;
+	}else if(mask0 == 1){
+		unsigned char* regs = (unsigned char*) &machine->registers;
+		val = &regs[2 * arg0];
+	}else if(mask0 == 2){
+
+	}else if (mask0 == 3){
+
+	}
+
+	return val;
 }
 
 void *vm_parse_ins(vm_t *machine){

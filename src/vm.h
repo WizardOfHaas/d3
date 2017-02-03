@@ -6,7 +6,7 @@
 #include "mem.h"
 
 typedef struct vm_registers_tag{
-	uint32_t ip, sp, bp, r0, r1, r2, r3, flags;
+	short r0, r1, r2, r3, ip, sp, bp;
 }vm_regs_t;
 
 enum vm_status{
@@ -58,8 +58,8 @@ typedef struct vm_ins_tag{
 
 void init_vmm();
 vm_ins *vm_get_instuction(vm_t *machine);
-void vm_write(vm_t *machine, vm_op_mask mask, unsigned int v0, unsigned int v1);
-void *vm_read(vm_t *machine, vm_op_mask mask, unsigned int v0);
+void vm_write(vm_t *machine, vm_ins *ins);
+void *vm_read(vm_t *machine, char mask0, short arg0);
 void *vm_parse_ins(vm_t *machine);
 
 #endif
