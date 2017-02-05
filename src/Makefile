@@ -12,6 +12,7 @@ all:
 		./io.c \
 		./fat12.c \
 		./gdt.c \
+		./idt.c \
 		 -std=gnu99 -ffreestanding -O2 -Wfatal-errors -w
 
 	~/opt/cross/bin/i686-elf-gcc -T linker.ld -o d3.kernel -ffreestanding -O2 -nostdlib \
@@ -27,6 +28,7 @@ all:
 		io.o \
 		fat12.o \
 		gdt.o \
+		idt.o \
 		-lgcc
 
 clean:

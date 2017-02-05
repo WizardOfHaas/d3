@@ -6,9 +6,9 @@
 
 //! installs gdtr
 static void gdt_install(){
-#ifdef _MSC_VER
-	_asm lgdt [_gdtr]
-#endif
+	//_asm lgdt [_gdtr]
+
+	asm volatile("lgdt (%0)" :: "r"(_gdtr));
 }
 
 //! Setup a descriptor in the Global Descriptor Table

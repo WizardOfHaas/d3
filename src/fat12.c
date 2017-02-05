@@ -13,8 +13,10 @@ const int DMA_BUFFER = 0x1000;
 
 void init_fat12(){
 	flpydsk_initialize_dma();
+	flpydsk_reset();
+	flpydsk_drive_data (13, 1, 0xf, true);
 
-	int sector_num = 0;
+	int sector_num = 10;
 	uint8_t* sector = flpydsk_read_sector(sector_num);
 
 	mem_dump(&tty0, sector, 32);
