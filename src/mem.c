@@ -203,3 +203,11 @@ void mem_dump(term_t* term, void* addr, size_t size){
   }
   term_writestring(term, "\n");
 }
+
+void mem_set(void *dst, char val, size_t size){
+  unsigned char* d = (unsigned char*) dst;
+
+  for(size_t i = 0; i < size; i++){
+    d[i] = val;
+  }
+}

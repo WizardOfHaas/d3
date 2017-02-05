@@ -34,14 +34,14 @@ void init_vmm(){
 	char test_code[] = {
 		0, 1, 1, 0, 5, 0, 0, 0, 10, 0,
 		0, 2, 0, 0, 15, 0, 0, 0, 0, 0,
-		0, 2, 1, 0, 0, 0, 0, 0, 0, 0,
+		0, 2, 0, 0, 14, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 	};
 
 	vm_copy_to_heap(&test_vm, 0, &test_code, 20);
 
 	//Try to run test_vm
-	vm_run(&test_vm);
+	//vm_run(&test_vm);
 }
 
 void vm_init(vm_t *machine, char *name){

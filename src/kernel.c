@@ -9,6 +9,10 @@
 #include "task.h"
 #include "vm.h"
 #include "vm_ops.h"
+#include "gdt.h"
+
+#include "io.h"
+#include "fat12.h"
 
 term_t tty0;
 
@@ -19,6 +23,12 @@ void kernel_panic(const char* c){
   term_writestring(&tty0, c);
 
   while(1){}
+}
+
+void sleep(t){ //Actually implement later
+  for(int i = 0; i < 1000*t; t++){
+
+  }
 }
 
 void cmain(multiboot_info_t* mbd)
@@ -42,5 +52,10 @@ void cmain(multiboot_info_t* mbd)
   //Init vm manager...
   term_writestring(&tty0, "Initializing vm manager...");
   init_vmm();
+  term_writestring(&tty0, "[OK]\n");
+
+  //Init fat12 driver
+  term_writestring(&tty0, "Initializing fat12 driver...");
+  init_fat12();
   term_writestring(&tty0, "[OK]\n");
 }

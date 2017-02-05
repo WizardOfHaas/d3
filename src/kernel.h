@@ -1,8 +1,17 @@
-#ifndef TERM_H
-#define TERM_H
+#ifndef KERNEL_H
+#define KERNEL_H
+
+#include <stddef.h>
 #include "term.h"
-#endif
+
+typedef enum{
+  false,
+  true
+} bool;
 
 term_t tty0;
 
-kernel_panic(const char* c);
+void kernel_panic(const char* c);
+void sleep(int t);
+
+#endif
