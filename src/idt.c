@@ -4,85 +4,47 @@
 #include "gdt.h"
 #include "idt.h"
 
-void idt_init(){
-	i86_install_ir(5, I86_IDT_DESC_PRESENT | I86_IDT_DESC_BIT32,
-		0x8, (I86_IRQ_HANDLER)int_handler);
-
-	//asm volatile("int $5");
+void init_idt(){
+	idt_set_gate(32, (unsigned)isr_wrapper, 0x08, 0x8E);
+	//__asm__("int $32");
 }
 
-struct interrupt_frame;
- 
-__attribute__((interrupt)) void int_handler(struct interrupt_frame* frame)
-{
-    term_writestring(&tty0, "int 0x005\n");
+void idt_load(){
+	__asm__("lidt (%0)" :: "m"(idtp));
 }
 
-//! installs idtr into processors idtr register
+void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags){
+    /* The interrupt routine's base address */
+    idt[num].base_lo = (base & 0xFFFF);
+    idt[num].base_hi = (base >> 16) & 0xFFFF;
+
+    /* The segment or 'selector' that this IDT entry will use
+    *  is set here, along with any access flags */
+    idt[num].sel = sel;
+    idt[num].always0 = 0;
+    idt[num].flags = flags;
+}
+
 void idt_install(){
-	//_asm lidt [_idtr]
-	asm volatile("lidt (%0)" :: "r"(_idtr));
+    /* Sets the special IDT pointer up, just like in 'gdt.c' */
+    idtp.limit = (sizeof(struct idt_entry) * 256) - 1;
+    idtp.base = &idt;
+
+    /* Clear out the entire IDT, initializing it to zeros */
+    mem_set(&idt, 0, sizeof(struct idt_entry) * 256);
+
+    /* Add any new ISRs to the IDT here using idt_set_gate */
+
+    /* Points the processor's internal register to the new IDT */
+    idt_load();
 }
 
-//! default handler to catch unhandled system interrupts.
-void i86_default_handler(){
-	for(;;);
+void isr_stub(){
+    __asm__("pushal");
+    term_writestring(&tty0, "ISR!\n");
+    __asm__("popal; leave; iret"); /* BLACK MAGIC! */
 }
 
-//! generate interrupt call
-void geninterrupt(int n){
-	/*
-	_asm {
-		mov al, byte ptr [n]
-		mov byte ptr [genint+1], al
-		jmp genint
-	genint:
-		int 0	// above code modifies the 0 to int number to generate
-	}
-	*/
-
-	/*asm volatile(
-		"mov byte ptr(%0), %%al" :: "r"(n)
-	);*/
-}
-
-//! installs a new interrupt handler
-int i86_install_ir(uint32_t i, uint16_t flags, uint16_t sel, void* irq){
-	if (i>I86_MAX_INTERRUPTS)
-		return 0;
- 
-	if (!irq)
-		return 0;
- 
-	//! get base address of interrupt handler
-	uint64_t		uiBase = (uint64_t)&(*irq);
- 
-	//! store base address into idt
-	_idt[i].baseLo		=	uiBase & 0xffff;
-	_idt[i].baseHi		=	(uiBase >> 16) & 0xffff;
-	_idt[i].reserved	=	0;
-	_idt[i].flags		=	flags;
-	_idt[i].sel		=	sel;
- 
-	return	0;
-}
-
-//! initialize idt
-int i86_idt_initialize(uint16_t codeSel){
-	//! set up idtr for processor
-	_idtr.limit = sizeof (struct idt_descriptor) * I86_MAX_INTERRUPTS -1;
-	_idtr.base	= (uint32_t)&_idt[0];
- 
-	//! null out the idt
-	mem_set((void*)&_idt[0], 0, 8 * I86_MAX_INTERRUPTS-1);
- 
-	//! register default handlers
-	for (int i=0; i<I86_MAX_INTERRUPTS; i++)
-		i86_install_ir (i, I86_IDT_DESC_PRESENT | I86_IDT_DESC_BIT32,
-			codeSel, (I86_IRQ_HANDLER)i86_default_handler);
- 
-	//! install our idt
-	idt_install ();
- 
-	return 0;
+void isr_handler(){
+	term_writestring(&tty0, "ISR!\n");
 }

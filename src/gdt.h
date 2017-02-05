@@ -43,32 +43,31 @@
 //! 4k grandularity. default: none
 #define I86_GDT_GRAND_4K			0x80			//10000000
 
-struct gdt_descriptor {
-	//! bits 0-15 of segment limit
-	uint16_t		limit;
+/* Defines a GDT entry. We say packed, because it prevents the
+*  compiler from doing things that it thinks is best: Prevent
+*  compiler "optimization" by packing */
+struct gdt_entry
+{
+    unsigned short limit_low;
+    unsigned short base_low;
+    unsigned char base_middle;
+    unsigned char access;
+    unsigned char granularity;
+    unsigned char base_high;
+} __attribute__((packed));
 
-	//! bits 0-23 of base address
-	uint16_t		baseLo;
-	uint8_t			baseMid;
+/* Special pointer which includes the limit: The max bytes
+*  taken up by the GDT, minus 1. Again, this NEEDS to be packed */
+struct gdt_ptr
+{
+    unsigned short limit;
+    unsigned int base;
+} __attribute__((packed));
 
-	//! descriptor access flags
-	uint8_t			flags;
+/* Our GDT, with 3 entries, and finally our special GDT pointer */
+struct gdt_entry gdt[3];
+struct gdt_ptr gp;
 
-	uint8_t			grand;
-
-	//! bits 24-32 of base address
-	uint8_t			baseHi;
-};
-
-struct gdtr{
-	//! size of gdt
-	uint16_t		m_limit;
- 
-	//! base address of gdt
-	uint32_t		m_base;
-};
-
-static struct gdt_descriptor _gdt[MAX_DESCRIPTORS];
-static struct gdtr _gdtr;
+void gdt_install();
 
 #endif

@@ -16,40 +16,35 @@
 #define I86_IDT_DESC_RING3		0x60	//01100000
 #define I86_IDT_DESC_PRESENT		0x80	//10000000
 
-typedef void (*I86_IRQ_HANDLER)(void);
+struct idt_entry
+{
+    unsigned short base_lo;
+    unsigned short sel;        /* Our kernel segment goes here! */
+    unsigned char always0;     /* This will ALWAYS be set to 0! */
+    unsigned char flags;       /* Set using the above table! */
+    unsigned short base_hi;
+} __attribute__((packed));
 
-//! interrupt descriptor
-struct idt_descriptor{
-	//! bits 0-16 of interrupt routine (ir) address
-	uint16_t		baseLo;
- 
-	//! code selector in gdt
-	uint16_t		sel;
- 
-	//! reserved, shold be 0
-	uint8_t			reserved;
- 
-	//! bit flags. Set with flags above
-	uint8_t			flags;
- 
-	//! bits 16-32 of ir address
-	uint16_t		baseHi;
-};
+struct idt_ptr
+{
+    unsigned short limit;
+    unsigned int base;
+} __attribute__((packed));
 
-struct idtr{
-	//! size of the interrupt descriptor table (idt)
-	uint16_t		limit;
- 
-	//! base address of idt
-	uint32_t		base;
-};
+/* Declare an IDT of 256 entries. Although we will only use the
+*  first 32 entries in this tutorial, the rest exists as a bit
+*  of a trap. If any undefined IDT entry is hit, it normally
+*  will cause an "Unhandled Interrupt" exception. Any descriptor
+*  for which the 'presence' bit is cleared (0) will generate an
+*  "Unhandled Interrupt" exception */
+struct idt_entry idt[256];
+struct idt_ptr idtp;
 
-static struct idt_descriptor	_idt [I86_MAX_INTERRUPTS];
-static struct idtr				_idtr;
+void init_idt();
+void isr_stub();
+void isr_handler();
+void idt_load();
 
-void int_handler();
-void idt_init();
-int i86_install_ir(uint32_t i, uint16_t flags, uint16_t sel, void* irq);
-void geninterrupt(int n);
+extern void isr_wrapper();
 
 #endif

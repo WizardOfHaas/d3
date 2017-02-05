@@ -5,53 +5,63 @@
 //Mainly from brokenthorn
 
 //! installs gdtr
-static void gdt_install(){
+static void gdt_load(){
 	//_asm lgdt [_gdtr]
 
-	asm volatile("lgdt (%0)" :: "r"(_gdtr));
+	__asm__("lgdt (%0)\n\t"
+		"mov $0x10, %%ax\n\t"
+		"mov %%ax, %%ds\n\t"
+		"mov %%ax, %%es\n\t"
+		"mov %%ax, %%fs\n\t"
+		"mov %%ax, %%gs\n\t"
+		"mov %%ax, %%ss\n\t"
+		"jmp 1f\n\t"
+		"1: ret\n\t"
+		 :: "m"(gp));
 }
 
-//! Setup a descriptor in the Global Descriptor Table
-void gdt_set_descriptor(uint32_t i, uint64_t base, uint64_t limit, uint8_t access, uint8_t grand){
-	if (i > MAX_DESCRIPTORS)
-		return;
- 
-	//! null out the descriptor
-	mem_set ((void*)&_gdt[i], 0, 8 * 3);
- 
-	//! set limit and base addresses
-	_gdt[i].baseLo	= base & 0xffff;
-	_gdt[i].baseMid	= (base >> 16) & 0xff;
-	_gdt[i].baseHi	= (base >> 24) & 0xff;
-	_gdt[i].limit	= limit & 0xffff;
- 
-	//! set flags and grandularity bytes
-	_gdt[i].flags = access;
-	_gdt[i].grand = (limit >> 16) & 0x0f;
-	_gdt[i].grand |= grand & 0xf0;
- 
+/* Setup a descriptor in the Global Descriptor Table */
+void gdt_set_gate(int num, unsigned long base, unsigned long limit, unsigned char access, unsigned char gran){
+    /* Setup the descriptor base address */
+    gdt[num].base_low = (base & 0xFFFF);
+    gdt[num].base_middle = (base >> 16) & 0xFF;
+    gdt[num].base_high = (base >> 24) & 0xFF;
+
+    /* Setup the descriptor limits */
+    gdt[num].limit_low = (limit & 0xFFFF);
+    gdt[num].granularity = ((limit >> 16) & 0x0F);
+
+    /* Finally, set up the granularity and access flags */
+    gdt[num].granularity |= (gran & 0xF0);
+    gdt[num].access = access;
 }
 
-int i86_gdt_initialize(){
-	//! set up gdtr
-	_gdtr.m_limit = (sizeof (struct gdt_descriptor) * MAX_DESCRIPTORS)-1;
-	_gdtr.m_base = (uint32_t)&_gdt[0];
- 
-	//! set null descriptor
-	gdt_set_descriptor(0, 0, 0, 0, 0);
- 
-	//! set default code descriptor
-	gdt_set_descriptor (1,0,0xffffffff,
-		I86_GDT_DESC_READWRITE|I86_GDT_DESC_EXEC_CODE|I86_GDT_DESC_CODEDATA|I86_GDT_DESC_MEMORY,
-		I86_GDT_GRAND_4K | I86_GDT_GRAND_32BIT | I86_GDT_GRAND_LIMITHI_MASK);
- 
-	//! set default data descriptor
-	gdt_set_descriptor (2,0,0xffffffff,
-		I86_GDT_DESC_READWRITE|I86_GDT_DESC_CODEDATA|I86_GDT_DESC_MEMORY,
-		I86_GDT_GRAND_4K | I86_GDT_GRAND_32BIT | I86_GDT_GRAND_LIMITHI_MASK);
- 
-	//! install gdtr
-	gdt_install ();
- 
-	return 0;
+/* Should be called by main. This will setup the special GDT
+*  pointer, set up the first 3 entries in our GDT, and then
+*  finally call gdt_flush() in our assembler file in order
+*  to tell the processor where the new GDT is and update the
+*  new segment registers */
+void gdt_install(){
+    /* Setup the GDT pointer and limit */
+    gp.limit = (sizeof(struct gdt_entry) * 3) - 1;
+    gp.base = &gdt;
+
+    /* Our NULL descriptor */
+    gdt_set_gate(0, 0, 0, 0, 0);
+
+    /* The second entry is our Code Segment. The base address
+    *  is 0, the limit is 4GBytes, it uses 4KByte granularity,
+    *  uses 32-bit opcodes, and is a Code Segment descriptor.
+    *  Please check the table above in the tutorial in order
+    *  to see exactly what each value means */
+    gdt_set_gate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);
+
+    /* The third entry is our Data Segment. It's EXACTLY the
+    *  same as our code segment, but the descriptor type in
+    *  this entry's access byte says it's a Data Segment */
+    gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF);
+
+    /* Flush out the old GDT and install the new changes! */
+    gdt_load();
 }
+	

@@ -1,6 +1,8 @@
 all:
 	~/opt/cross/bin/i686-elf-as ./boot.S -o boot.o
 	~/opt/cross/bin/i686-elf-as ./switch.S -o switch.o
+	~/opt/cross/bin/i686-elf-as ./isr.S -o isr.o
+
 	~/opt/cross/bin/i686-elf-gcc -c \
 		./kernel.c \
 		./mem.c \
@@ -29,6 +31,7 @@ all:
 		fat12.o \
 		gdt.o \
 		idt.o \
+		isr.o \
 		-lgcc
 
 clean:

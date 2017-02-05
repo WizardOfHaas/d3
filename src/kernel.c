@@ -39,15 +39,21 @@ void cmain(multiboot_info_t* mbd)
 
   //Splash...
   term_writestring(&tty0, "d3 Booting...\n\n");
+  
+  //Init GDT...
+  term_writestring(&tty0, "Initializing GDT...");
+  gdt_install();
+  term_writestring(&tty0, "[OK]\n");
+
+  //Init IDT...
+  term_writestring(&tty0, "Initializing IDT/ISRs...");
+  init_idt();
+  term_writestring(&tty0, "[OK]\n");
 
   //Init memory manager and print some stats...
   term_writestring(&tty0, "Initializing memory manager...");
   init_mm(mbd);
   term_writestring(&tty0, "[OK]\n");
-
-  i86_gdt_initialize();
-  i86_idt_initialize (0x8);
-  idt_init();
 
   //Init task manager...
   term_writestring(&tty0, "Initializing task manager...");
