@@ -15,7 +15,10 @@ all:
 		./fat12.c \
 		./gdt.c \
 		./idt.c \
+<<<<<<< HEAD
 		./keybd.c \
+=======
+>>>>>>> 18537be7b3342b2c399aeb2640cf415742cd4122
 		 -std=gnu99 -ffreestanding -O2 -Wfatal-errors -w
 
 	~/opt/cross/bin/i686-elf-gcc -T linker.ld -o d3.kernel -ffreestanding -O2 -nostdlib \
@@ -33,7 +36,10 @@ all:
 		gdt.o \
 		idt.o \
 		isr.o \
+<<<<<<< HEAD
 		keybd.o \
+=======
+>>>>>>> 18537be7b3342b2c399aeb2640cf415742cd4122
 		-lgcc
 
 clean:
