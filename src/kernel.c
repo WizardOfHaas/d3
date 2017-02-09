@@ -9,6 +9,13 @@
 #include "task.h"
 #include "vm.h"
 #include "vm_ops.h"
+#include "gdt.h"
+#include "idt.h"
+
+#include "io.h"
+#include "fat12.h"
+
+#define from_bcd(val)  ((val / 16) * 10 + (val & 0xf))
 
 term_t tty0;
 
@@ -21,6 +28,13 @@ void kernel_panic(const char* c){
   while(1){}
 }
 
+void sleep(t){ //Actually implement later
+  int time = get_time();
+  while(time < t){
+    time = get_time();
+  }
+}
+
 void cmain(multiboot_info_t* mbd)
 {
   //Initialize first terminal
@@ -28,6 +42,16 @@ void cmain(multiboot_info_t* mbd)
 
   //Splash...
   term_writestring(&tty0, "d3 Booting...\n\n");
+
+  //Init GDT...
+  term_writestring(&tty0, "Initializing GDT...");
+  gdt_install();
+  term_writestring(&tty0, "[OK]\n");
+
+  //Init IDT...
+  term_writestring(&tty0, "Initializing IDT/ISRs...");
+  init_idt();
+  term_writestring(&tty0, "[OK]\n");
 
   //Init memory manager and print some stats...
   term_writestring(&tty0, "Initializing memory manager...");
@@ -43,4 +67,43 @@ void cmain(multiboot_info_t* mbd)
   term_writestring(&tty0, "Initializing vm manager...");
   init_vmm();
   term_writestring(&tty0, "[OK]\n");
+
+  //Init fat12 driver
+  term_writestring(&tty0, "Initializing fat12 driver...");
+  //init_fat12();
+  term_writestring(&tty0, "[OK]\n");
+
+  term_writestring(&tty0, ">");
+  char c;
+  while(c = getchar()){
+    term_putchar(&tty0, c);
+  }
+  term_writestring(&tty0, ">");
+}
+
+void cmos_dump(uint16_t * values){
+  uint16_t index;
+  for (index = 0; index < 128; ++index) {
+    outb(0x70, index);
+    values[index] = inb(0x71);
+  }
+}
+
+int get_time(){
+  uint16_t values[128]; /* CMOS dump */
+  cmos_dump(values);
+
+  uint16_t hours;
+  uint16_t minutes;
+  uint16_t seconds;
+  uint16_t day;
+  uint16_t month;
+
+  hours   = from_bcd(values[4]);
+  minutes = from_bcd(values[2]);
+  seconds = from_bcd(values[0]);
+  month = from_bcd(values[8]);
+  day   = from_bcd(values[7]);
+
+  return seconds + minutes * 60 + hours * 3600;
 }

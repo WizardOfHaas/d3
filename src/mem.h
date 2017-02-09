@@ -33,6 +33,7 @@ void free(mp_t *entry);
 void add_buddy(mp_t* entry, mp_t* new);
 void mem_dump(term_t* term, void* addr, size_t size);
 void print_mem_map();
+void mem_set(void *dst, char val, size_t size);
 
 void init_stack(stack_t* stack);
 void stack_push(stack_t* stack, void* el);

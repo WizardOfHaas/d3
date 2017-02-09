@@ -1,5 +1,6 @@
-#include <stdbool.h>
 #include <stdint.h>
+
+#include "kernel.h"
 
 char* itoa(int val, int base){
   if(val == 0){

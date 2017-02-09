@@ -18,7 +18,6 @@ void vm_op_register(vm_op *vm_ops[], vm_op *op, int opcode){
 }
 
 void vm_run_op(vm_t *machine){
-	//unsigned char *ins = (unsigned char*) vm_get_instuction(machine);
 	vm_ins* ins = vm_get_instuction(machine);
 	vm_ops[ins->op].op(machine, ins);
 }
@@ -42,7 +41,7 @@ int op_push(vm_t *machine, vm_ins *instruction){
 	short val = vm_read(machine, instruction->arg0_mask, instruction->arg0);
 
 	heap[machine->registers.sp] = val;
-	machine->registers.sp++;
+	machine->registers.sp += 2;
 
 	return 0;
 }
