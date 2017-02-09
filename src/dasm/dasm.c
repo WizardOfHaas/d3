@@ -38,7 +38,7 @@ char* code = "mov r0 10\nmov sp [12]\npush r0\npop r1\nmov [r2] r1\nhlt";
 
 ins_t ins[255];
 
-int main(){
+int main(int argc, char *argv[]){
 	int len = strlen(code);
 	int ptr = 0;
 	int tok_len = 0;
