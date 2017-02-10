@@ -45,7 +45,7 @@ void cmain(multiboot_info_t* mbd)
 
   //Init GDT...
   term_writestring(&tty0, "Initializing GDT...");
-  gdt_install();
+  gdt_init();
   term_writestring(&tty0, "[OK]\n");
 
   //Init IDT...

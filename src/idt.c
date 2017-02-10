@@ -5,13 +5,20 @@
 #include "idt.h"
 
 void init_idt(){
-	idt_set_gate(32, (unsigned)isr_wrapper, 0x08, 0x8E);
+    idt_set_gate(0, (unsigned)isr_stub, 0x08, 0x8E);
+    idt_set_gate(1, (unsigned)isr_stub, 0x08, 0x8E);
+	idt_set_gate(32, (unsigned)isr_stub, 0x08, 0x8E);
+
+    idt_install();
+    //__asm__("sti");
 	//__asm__("int $32");
+    mem_dump(&tty0, &idtp, 32);
+    mem_dump(&tty0, &gp, 32);
 }
 
-void idt_load(){
+/*void idt_load(){
 	__asm__("lidt (%0)" :: "m"(idtp));
-}
+}*/
 
 void idt_set_gate(unsigned char num, unsigned long base, unsigned short sel, unsigned char flags){
     /* The interrupt routine's base address */
@@ -39,12 +46,19 @@ void idt_install(){
     idt_load();
 }
 
-void isr_stub(){
+/*void isr_stub(){
     __asm__("pushal");
     term_writestring(&tty0, "ISR!\n");
     __asm__("popal; leave; iret"); /* BLACK MAGIC! */
-}
+//}
 
 void isr_handler(){
 	term_writestring(&tty0, "ISR!\n");
+}
+
+struct interrupt_frame;
+ 
+__attribute__((interrupt)) void isr_stub(struct interrupt_frame* frame)
+{
+    /* do something */
 }

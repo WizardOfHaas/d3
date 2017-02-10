@@ -2,13 +2,16 @@
 #include "mem.h"
 #include "gdt.h"
 
-//Mainly from brokenthorn
+void gdt_init(){
+    gdt_install();
+}
 
 //! installs gdtr
 static void gdt_load(){
-	//_asm lgdt [_gdtr]
+	gdt_flush();
 
-	__asm__("lgdt (%0)\n\t"
+	/*__asm__(
+        "lgdt (%0)\n\t"
 		"mov $0x10, %%ax\n\t"
 		"mov %%ax, %%ds\n\t"
 		"mov %%ax, %%es\n\t"
@@ -17,7 +20,7 @@ static void gdt_load(){
 		"mov %%ax, %%ss\n\t"
 		"jmp 1f\n\t"
 		"1: ret\n\t"
-		 :: "m"(gp));
+		 :: "m"(gp));*/
 }
 
 /* Setup a descriptor in the Global Descriptor Table */
