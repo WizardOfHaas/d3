@@ -23,8 +23,8 @@ void init_vmm(){
 
 	//Lets add some data to the heap...
 	//Using the assembler!
-	char* test = "mov sp 10\n"
-				"push 11\n"
+	char* test = "mov sp 1\n"
+				"pop r0\n"
 				"hlt";
 
 	void* code = dasm(test);
@@ -71,48 +71,42 @@ void vm_copy_to_heap(vm_t *machine, int address, void *data, size_t size){
 }
 
 vm_ins *vm_get_instuction(vm_t *machine){
-	uint32_t *heap = (uint32_t)machine->heap->address;
-	uint32_t ip = machine->registers.ip;
-
 	//mask,op,mask,val,mask,val
 	//1,   1, 1    2,  1,   2    <--bytes
 
-	return (vm_ins*)(heap + ip);
+	return (vm_ins*)(machine->heap->address + machine->registers.ip);
 }
 
 void vm_run(vm_t *machine){
 	if(machine->status == VM_READY){
 		machine->status = VM_RUN;
 
-		mem_dump(&tty0, machine->heap->address, 32);
-		vm_dump_registers(&tty0, machine);
-
 		while(machine->status == VM_RUN){
 			vm_run_op(machine);
 			machine->registers.ip += 10;
 
-			mem_dump(&tty0, machine->heap->address, 32);
+			mem_dump(&tty0, machine->heap->address + machine->registers.ip, 32);
 			vm_dump_registers(&tty0, machine);
 		}
 	}
 }
 
 void vm_dump_registers(term_t *term, vm_t *machine){
-	term_writestring(term, "\n  ip: ");
-	term_writestring(term, itoa(machine->registers.ip));
+	term_writestring(term, "  ip: ");
+	term_writestring(term, itoa(machine->registers.ip, 16));
 	term_writestring(term, "  sp: ");
-	term_writestring(term, itoa(machine->registers.sp));
+	term_writestring(term, itoa(machine->registers.sp, 16));
 	term_writestring(term, "  bp: ");
-	term_writestring(term, itoa(machine->registers.bp));
+	term_writestring(term, itoa(machine->registers.bp, 16));
 
-	term_writestring(term, "\n  r0: ");
-	term_writestring(term, itoa(machine->registers.r0));
+	term_writestring(term, "  r0: ");
+	term_writestring(term, itoa(machine->registers.r0, 16));
 	term_writestring(term, "  r1: ");
-	term_writestring(term, itoa(machine->registers.r1));
+	term_writestring(term, itoa(machine->registers.r1, 16));
 	term_writestring(term, "  r2: ");
-	term_writestring(term, itoa(machine->registers.r2));
+	term_writestring(term, itoa(machine->registers.r2, 16));
 	term_writestring(term, "  r3: ");
-	term_writestring(term, itoa(machine->registers.r3));
+	term_writestring(term, itoa(machine->registers.r3, 16));
 
 	term_writestring(term, "\n");
 }
@@ -157,6 +151,5 @@ short vm_read(vm_t *machine, char mask0, short arg0){
 
 void *vm_parse_ins(vm_t *machine){
 	unsigned char *ins = (unsigned char*) vm_get_instuction(machine);
-
 
 }

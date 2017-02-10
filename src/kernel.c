@@ -45,14 +45,14 @@ void cmain(multiboot_info_t* mbd)
   term_writestring(&tty0, "d3 Booting...\n\n");
 
   //Init GDT...
-  term_writestring(&tty0, "Initializing GDT...");
+  /*term_writestring(&tty0, "Initializing GDT...");
   gdt_init();
   term_writestring(&tty0, "[OK]\n");
 
   //Init IDT...
   term_writestring(&tty0, "Initializing IDT/ISRs...");
   init_idt();
-  term_writestring(&tty0, "[OK]\n");
+  term_writestring(&tty0, "[OK]\n");*/
 
   //Init memory manager and print some stats...
   term_writestring(&tty0, "Initializing memory manager...");
@@ -60,19 +60,19 @@ void cmain(multiboot_info_t* mbd)
   term_writestring(&tty0, "[OK]\n");
 
   //Init task manager...
-  term_writestring(&tty0, "Initializing task manager...");
+  /*term_writestring(&tty0, "Initializing task manager...");
   init_tasker();
-  term_writestring(&tty0, "[OK]\n");
+  term_writestring(&tty0, "[OK]\n");*/
 
   //Init vm manager...
   term_writestring(&tty0, "Initializing vm manager...");
   init_vmm();
-  term_writestring(&tty0, "[OK]\n");
+  //term_writestring(&tty0, "[OK]\n");
 
   //Init fat12 driver
-  term_writestring(&tty0, "Initializing fat12 driver...");
+  //term_writestring(&tty0, "Initializing fat12 driver...");
   //init_fat12();
-  term_writestring(&tty0, "[OK]\n");
+  //term_writestring(&tty0, "[OK]\n");
 }
 
 void cmos_dump(uint16_t * values){
