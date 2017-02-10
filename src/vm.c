@@ -2,6 +2,7 @@
 #include "vm.h"
 #include "vm_ops.h"
 #include "term.h"
+#include "dasm.h"
 #include "kernel.h"
 
 vm_pool main_vm_pool;
@@ -21,39 +22,31 @@ void init_vmm(){
 	vm_add_to_pool(&main_vm_pool, &test_vm);
 
 	//Lets add some data to the heap...
-	/*
-	Example of building instruction as a struct...
-	vm_ins test_ins;
-	test_ins.op_mask = 0;
-	test_ins.op = 1;
-	test_ins.arg0_mask = 1;
-	test_ins.arg0 = 0;
-	test_ins.arg1_mask = 1;
-	test_ins.arg1 = 3;*/
+	//Using the assembler!
+	char* test = "mov sp 10\n"
+				"push 11\n"
+				"hlt";
 
-	char test_code[] = {
-		0, 1, 1, 0, 5, 0, 0, 0, 10, 0,
-		0, 2, 0, 0, 15, 0, 0, 0, 0, 0,
-		0, 2, 0, 0, 14, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-	};
+	void* code = dasm(test);
 
-	vm_copy_to_heap(&test_vm, 0, &test_code, 20);
+	//mem_dump(&tty0, code, 32);
+
+	vm_copy_to_heap(&test_vm, 0, code, 255 * sizeof(vm_ins));
 
 	//Try to run test_vm
-	//vm_run(&test_vm);
+	vm_run(&test_vm);
 }
 
 void vm_init(vm_t *machine, char *name){
 	machine->name = name;
-	machine->heap = malloc(1024);	
+	machine->heap = malloc(1024);
 	machine->registers.ip = 0;
 	machine->registers.sp = 0;
 	machine->registers.bp = 0;
 	machine->registers.r0 = 0;
-	machine->registers.r1 = 1;
-	machine->registers.r2 = 2;
-	machine->registers.r3 = 10;
+	machine->registers.r1 = 0;
+	machine->registers.r2 = 0;
+	machine->registers.r3 = 0;
 	machine->status = VM_READY;
 }
 

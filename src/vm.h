@@ -56,6 +56,10 @@ typedef struct vm_ins_tag{
 	short arg1;
 } vm_ins;
 
+typedef struct vm_prog_tag{
+	vm_ins ins[255];
+} vm_prog_t;
+
 void init_vmm();
 vm_ins *vm_get_instuction(vm_t *machine);
 void vm_write(vm_t *machine, char mask0, short arg0, short val);

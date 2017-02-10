@@ -16,6 +16,7 @@ all:
 		./gdt.c \
 		./idt.c \
 		./keybd.c \
+		./dasm.c \
 		 -std=gnu99 -ffreestanding -O2 -Wfatal-errors -w
 
 	~/opt/cross/bin/i686-elf-gcc -T linker.ld -o d3.kernel -ffreestanding -O2 -nostdlib \
@@ -34,6 +35,7 @@ all:
 		idt.o \
 		isr.o \
 		keybd.o \
+		dasm.o \
 		-lgcc
 
 clean:

@@ -11,6 +11,7 @@
 #include "vm_ops.h"
 #include "gdt.h"
 #include "idt.h"
+#include "dasm.h"
 
 #include "io.h"
 #include "fat12.h"
@@ -72,13 +73,6 @@ void cmain(multiboot_info_t* mbd)
   term_writestring(&tty0, "Initializing fat12 driver...");
   //init_fat12();
   term_writestring(&tty0, "[OK]\n");
-
-  term_writestring(&tty0, ">");
-  char c;
-  while(c = getchar()){
-    term_putchar(&tty0, c);
-  }
-  term_writestring(&tty0, ">");
 }
 
 void cmos_dump(uint16_t * values){

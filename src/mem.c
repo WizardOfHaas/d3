@@ -110,6 +110,10 @@ void print_mem_map(){
   term_writestring(&tty0, "\n");
 }
 
+void* malloc_raw(size_t size){
+  return malloc(size)->address;
+}
+
 mp_t* malloc(size_t size){
   mp_t *temp = &mm_free;
   mp_t *largest = &mm_free;
