@@ -23,8 +23,10 @@ void init_vmm(){
 
 	//Lets add some data to the heap...
 	//Using the assembler!
-	char* test = "mov sp 1\n"
-				"pop r0\n"
+	char* test = "mov r0 1\n"
+				"mov r1 2\n"
+				"mov r2 3\n"
+				"cmp r3 4\n"
 				"hlt";
 
 	void* code = dasm(test);
@@ -47,6 +49,7 @@ void vm_init(vm_t *machine, char *name){
 	machine->registers.r1 = 0;
 	machine->registers.r2 = 0;
 	machine->registers.r3 = 0;
+	machine->registers.flags = 0;
 	machine->status = VM_READY;
 }
 
@@ -83,11 +86,14 @@ void vm_run(vm_t *machine){
 
 		while(machine->status == VM_RUN){
 			vm_run_op(machine);
-			machine->registers.ip += 10;
-
 			mem_dump(&tty0, machine->heap->address + machine->registers.ip, 32);
 			vm_dump_registers(&tty0, machine);
+
+			machine->registers.ip += 10;
 		}
+
+		mem_dump(&tty0, machine->heap->address + machine->registers.ip, 32);
+		vm_dump_registers(&tty0, machine);
 	}
 }
 
@@ -107,6 +113,8 @@ void vm_dump_registers(term_t *term, vm_t *machine){
 	term_writestring(term, itoa(machine->registers.r2, 16));
 	term_writestring(term, "  r3: ");
 	term_writestring(term, itoa(machine->registers.r3, 16));
+	term_writestring(term, "  fr: ");
+	term_writestring(term, itoa(machine->registers.flags, 2));
 
 	term_writestring(term, "\n");
 }

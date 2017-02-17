@@ -8,8 +8,8 @@
 #include "str.h"
 #include "kernel.h"
 
-int num_ops = 4;
-char* ops[] = {"hlt", "mov", "push", "pop"};
+int num_ops = 5;
+char* ops[] = {"hlt", "mov", "push", "pop", "cmp"};
 
 char* regs[] = {"r0", "r1", "r2", "r3", "ip", "sp", "bp"};
 
@@ -44,7 +44,7 @@ void* dasm(char* code){
 
 	for(int i = 0; i < cur_ins; i++){
 		vm_ins vm_in;
-		vm_in.op_mask = ins[i].op_mask;
+		vm_in.op_mask = 15;//ins[i].op_mask;
 		vm_in.op = ins[i].op;
 		vm_in.arg0_mask = ins[i].m0;
 		vm_in.arg0 = ins[i].a0;
@@ -66,10 +66,11 @@ void parse(ins_t* ins){
 	for(int i = 0; i < len + 1; i++){
 		if(ins->raw[i] == ' ' || ins->raw[i] == '\0'){
 			ins->tokens[t] = malloc_raw(tok_len + 1);
-			mem_cpy(ins->tokens[t], &ins->raw[i - tok_len], tok_len); 
+			mem_cpy(ins->tokens[t], &ins->raw[i - tok_len], tok_len);
 			ins->tokens[t][tok_len + 1] = '\0';
 
 			if(t == 0){
+				term_writestring(&tty0, ins->tokens[0]);
 				for(int o = 0; o < num_ops; o++){
 					if(strcmp(ins->tokens[0], ops[o]) == 0){
 						ins->op = o;

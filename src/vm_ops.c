@@ -11,6 +11,7 @@ void vm_ops_init(){
 	vm_op_register(&vm_ops, &op_mov, 1);
 	vm_op_register(&vm_ops, &op_push, 2);
 	vm_op_register(&vm_ops, &op_pop, 3);
+	vm_op_register(&vm_ops, &op_cmp, 4);
 }
 
 void vm_op_register(vm_op *vm_ops[], vm_op *op, int opcode){
@@ -55,4 +56,27 @@ int op_pop(vm_t *machine, vm_ins *instruction){
 	vm_write(machine, instruction->arg0_mask, instruction->arg0, val);
 
 	return 0;
+}
+
+int op_cmp(vm_t *machine, vm_ins *instruction){
+	short a0 = vm_read(machine, instruction->arg0_mask, instruction->arg0);
+	short a1 = vm_read(machine, instruction->arg1_mask, instruction->arg1);
+
+	if(a0 == a1){
+		machine->registers.flags |= FLAG_EQ;
+	}else{
+		machine->registers.flags &= ~FLAG_EQ;
+	}
+
+	if(a0 >= a1){
+		machine->registers.flags |= FLAG_GTE;
+	}else{
+		machine->registers.flags &= ~FLAG_GTE;
+	}
+
+	if(a0 <= a1){
+		machine->registers.flags |= FLAG_LTE;
+	}else{
+		machine->registers.flags &= ~FLAG_LTE;
+	}
 }

@@ -16,5 +16,6 @@ int op_halt(vm_t *machine, vm_ins *instruction);
 int op_mov(vm_t *machine, vm_ins *instruction);
 int op_push(vm_t *machine, vm_ins *instruction);
 int op_pop(vm_t *machine, vm_ins *instruction);
+int op_cmp(vm_t *machine, vm_ins *instruction);
 
 #endif

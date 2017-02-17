@@ -5,8 +5,24 @@
 
 #include "mem.h"
 
+#define FLAG_EQ 0x01;
+#define FLAG_GTE 0x02;
+#define FLAG_LTE 0x04;
+#define FLAG_ZERO 0x08;
+#define FLAG_ERR 0x10;
+
+//const unsigned char flag_eq = 0x01; // hex for 0000 0001
+//const unsigned char flag_gte = 0x02; // hex for 0000 0010
+//const unsigned char flag_lte = 0x04; // hex for 0000 0100
+//const unsigned char flag_zero = 0x08; // hex for 0000 1000
+//const unsigned char flag_err = 0x10; // hex for 0001 0000
+//const unsigned char option6 = 0x20; // hex for 0010 0000
+//const unsigned char option7 = 0x40; // hex for 0100 0000
+//const unsigned char option8 = 0x80; // hex for 1000 0000
+
 typedef struct vm_registers_tag{
 	short r0, r1, r2, r3, ip, sp, bp;
+	char flags;
 }vm_regs_t;
 
 enum vm_status{
