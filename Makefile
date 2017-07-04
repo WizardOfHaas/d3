@@ -4,6 +4,7 @@ all:
 install:
 	mount -o loop disk.img ./dsk
 	cp src/d3.kernel dsk/
+	sleep 3
 	umount dsk
 
 clean:

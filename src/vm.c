@@ -23,7 +23,7 @@ void init_vmm(){
 
 	//Lets add some data to the heap...
 	//Using the assembler!
-	char* test = "push r0\n"
+	char* test = "mov r0 1\n"
 				"mov r1 2\n"
 				"mov r2 3\n"
 				"cmp r3 4\n"

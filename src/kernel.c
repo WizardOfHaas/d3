@@ -12,11 +12,10 @@
 #include "gdt.h"
 #include "idt.h"
 #include "dasm.h"
+#include "time.h"
 
 #include "io.h"
 #include "fat12.h"
-
-#define from_bcd(val)  ((val / 16) * 10 + (val & 0xf))
 
 term_t tty0;
 
@@ -27,13 +26,6 @@ void kernel_panic(const char* c){
   term_writestring(&tty0, c);
 
   while(1){}
-}
-
-void sleep(t){ //Actually implement later
-  int time = get_time();
-  while(time < t){
-    time = get_time();
-  }
 }
 
 void cmain(multiboot_info_t* mbd)
@@ -65,39 +57,18 @@ void cmain(multiboot_info_t* mbd)
   term_writestring(&tty0, "[OK]\n");*/
 
   //Init vm manager...
-  term_writestring(&tty0, "Initializing vm manager...");
-  init_vmm();
+  //term_writestring(&tty0, "Initializing vm manager...");
+  //init_vmm();
   //term_writestring(&tty0, "[OK]\n");
 
   //Init fat12 driver
   //term_writestring(&tty0, "Initializing fat12 driver...");
   //init_fat12();
   //term_writestring(&tty0, "[OK]\n");
-}
 
-void cmos_dump(uint16_t * values){
-  uint16_t index;
-  for (index = 0; index < 128; ++index) {
-    outb(0x70, index);
-    values[index] = inb(0x71);
+  for(int i = 0; i < 10; i++){
+    sleep(1);
+    term_writestring(&tty0, itoa(get_time(), 10));
+    term_writestring(&tty0, "\n");
   }
-}
-
-int get_time(){
-  uint16_t values[128]; /* CMOS dump */
-  cmos_dump(values);
-
-  uint16_t hours;
-  uint16_t minutes;
-  uint16_t seconds;
-  uint16_t day;
-  uint16_t month;
-
-  hours   = from_bcd(values[4]);
-  minutes = from_bcd(values[2]);
-  seconds = from_bcd(values[0]);
-  month = from_bcd(values[8]);
-  day   = from_bcd(values[7]);
-
-  return seconds + minutes * 60 + hours * 3600;
 }
