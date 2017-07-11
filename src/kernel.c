@@ -65,4 +65,7 @@ void cmain(multiboot_info_t* mbd)
   //term_writestring(&tty0, "Initializing fat12 driver...");
   //init_fat12();
   //term_writestring(&tty0, "[OK]\n");
+
+  term_writestring(&tty0, itoa(get_time(), 10));
+  term_writestring(&tty0, "\n");
 }

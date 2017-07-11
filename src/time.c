@@ -6,6 +6,8 @@
 
 #define from_bcd(val)  ((val / 16) * 10 + (val & 0xf))
 
+uint16_t days_in_month[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+
 void cmos_dump(uint16_t * values){
   uint16_t index;
   for (index = 0; index < 128; ++index) {
@@ -34,6 +36,8 @@ int32_t get_time(){
   		seconds +
   		minutes * 60 +
   		hours * 60 * 60 +
+  		day * 24 * 60 * 60 +
+  		days_in_month[month] * 24 * 60 * 60 +
   		(year - 2000) * 365.25 * 24 * 60 * 60
   	);
 }
