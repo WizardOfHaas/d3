@@ -9,7 +9,7 @@ int get_hours();
 int get_year();
 int get_month();
 int get_day_of_month();
-int get_time();
+int32_t get_time();
 
 void sleep(int t);
 

@@ -14,20 +14,28 @@ void cmos_dump(uint16_t * values){
   }
 }
 
-int get_time(){
+int32_t get_time(){
   uint16_t hours;
   uint16_t minutes;
   uint16_t seconds;
   uint16_t day;
   uint16_t month;
+  uint16_t year;
 
   hours   = get_hours();
   minutes = get_mins();
   seconds = get_secs();
   month = get_month();
   day   = get_day_of_month();
+  year = get_year();
 
-  return seconds + minutes * 60 + hours * 3600;
+  return 
+  	(int32_t)(
+  		seconds +
+  		minutes * 60 +
+  		hours * 60 * 60 +
+  		(year - 2000) * 365.25 * 24 * 60 * 60
+  	);
 }
 
 void sleep(t){ //Actually implement later
@@ -74,7 +82,7 @@ int get_year(){
 
   uint16_t year;
 
-  year   = from_bcd(values[9]);
+  year   = from_bcd(values[9]) + from_bcd(values[50]) * 100;
 
   return year;
 }
