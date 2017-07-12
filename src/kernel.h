@@ -12,6 +12,5 @@ typedef enum{
 term_t tty0;
 
 void kernel_panic(const char* c);
-void sleep(int t);
 
 #endif

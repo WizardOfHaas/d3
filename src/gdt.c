@@ -2,25 +2,8 @@
 #include "mem.h"
 #include "gdt.h"
 
-void gdt_init(){
+void init_gdt(){
     gdt_install();
-}
-
-//! installs gdtr
-static void gdt_load(){
-	gdt_flush();
-
-	/*__asm__(
-        "lgdt (%0)\n\t"
-		"mov $0x10, %%ax\n\t"
-		"mov %%ax, %%ds\n\t"
-		"mov %%ax, %%es\n\t"
-		"mov %%ax, %%fs\n\t"
-		"mov %%ax, %%gs\n\t"
-		"mov %%ax, %%ss\n\t"
-		"jmp 1f\n\t"
-		"1: ret\n\t"
-		 :: "m"(gp));*/
 }
 
 /* Setup a descriptor in the Global Descriptor Table */
@@ -65,6 +48,5 @@ void gdt_install(){
     gdt_set_gate(2, 0, 0xFFFFFFFF, 0x92, 0xCF);
 
     /* Flush out the old GDT and install the new changes! */
-    gdt_load();
+    gdt_flush();
 }
-	

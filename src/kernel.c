@@ -37,14 +37,14 @@ void cmain(multiboot_info_t* mbd)
   term_writestring(&tty0, "d3 Booting...\n\n");
 
   //Init GDT...
-  /*term_writestring(&tty0, "Initializing GDT...");
-  gdt_init();
+  term_writestring(&tty0, "Initializing GDT...");
+  init_gdt();
   term_writestring(&tty0, "[OK]\n");
 
   //Init IDT...
   term_writestring(&tty0, "Initializing IDT/ISRs...");
   init_idt();
-  term_writestring(&tty0, "[OK]\n");*/
+  term_writestring(&tty0, "[OK]\n");
 
   //Init memory manager and print some stats...
   term_writestring(&tty0, "Initializing memory manager...");
