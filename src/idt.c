@@ -13,6 +13,7 @@ void *irq_routines[16] = {
 };
 
 void init_idt(){
+	//Get IDT table built and installed
     idt_install();
 
     //Setup all the ISRs
@@ -52,6 +53,7 @@ void init_idt(){
     idt_set_gate(30, (unsigned)isr30, 0x08, 0x8E);
     idt_set_gate(31, (unsigned)isr31, 0x08, 0x8E);
 
+    //Setup IRQs
     irq_install();
 }
 
@@ -127,14 +129,12 @@ void fault_handler(struct regs *r){
 }
 
 /* This installs a custom IRQ handler for the given IRQ */
-void irq_install_handler(int irq, void (*handler)(struct regs *r))
-{
+void irq_install_handler(int irq, void (*handler)(struct regs *r)){
     irq_routines[irq] = handler;
 }
 
 /* This clears the handler for a given IRQ */
-void irq_uninstall_handler(int irq)
-{
+void irq_uninstall_handler(int irq){
     irq_routines[irq] = 0;
 }
 
@@ -146,8 +146,7 @@ void irq_uninstall_handler(int irq)
 *  Interrupt Controller (PICs - also called the 8259's) in
 *  order to make IRQ0 to 15 be remapped to IDT entries 32 to
 *  47 */
-void irq_remap(void)
-{
+void irq_remap(void){
     outb(0x20, 0x11);
     outb(0xA0, 0x11);
     outb(0x21, 0x20);
@@ -163,8 +162,7 @@ void irq_remap(void)
 /* We first remap the interrupt controllers, and then we install
 *  the appropriate ISRs to the correct entries in the IDT. This
 *  is just like installing the exception handlers */
-void irq_install()
-{
+void irq_install(){
     irq_remap();
 
     idt_set_gate(32, (unsigned)irq0, 0x08, 0x8E);
@@ -196,24 +194,23 @@ void irq_install()
 *  interrupt at BOTH controllers, otherwise, you only send
 *  an EOI command to the first controller. If you don't send
 *  an EOI, you won't raise any more IRQs */
-void irq_handler(struct regs *r)
-{
+void irq_handler(struct regs *r){
+	kernel_panic(itoa(r->int_no, 10));
+
     /* This is a blank function pointer */
     void (*handler)(struct regs *r);
 
     /* Find out if we have a custom handler to run for this
     *  IRQ, and then finally, run it */
     handler = irq_routines[r->int_no - 32];
-    if (handler)
-    {
+    if(handler){
         handler(r);
     }
 
     /* If the IDT entry that was invoked was greater than 40
     *  (meaning IRQ8 - 15), then we need to send an EOI to
     *  the slave controller */
-    if (r->int_no >= 40)
-    {
+    if(r->int_no >= 40){
         outb(0xA0, 0x20);
     }
 

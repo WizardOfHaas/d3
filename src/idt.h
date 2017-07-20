@@ -85,5 +85,6 @@ extern void irq15();
 
 void init_idt();
 void irq_install_handler(int irq, void (*handler)(struct regs *r));
+void keyboard_handler(struct regs *r);
 
 #endif

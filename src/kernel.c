@@ -34,7 +34,7 @@ void cmain(multiboot_info_t* mbd)
   term_init(&tty0, 80, 25, COLOR_LIGHT_GREY, COLOR_BLACK, (uint16_t*) 0xB8000);
 
   //Splash...
-  term_writestring(&tty0, "d3 Booting...\n\n");
+  term_writestring(&tty0, "d3 Kernel Booting...\n\n");
 
   //Init GDT...
   term_writestring(&tty0, "Initializing GDT...");
@@ -58,6 +58,9 @@ void cmain(multiboot_info_t* mbd)
   /*term_writestring(&tty0, "Initializing task manager...");
   init_tasker();
   term_writestring(&tty0, "[OK]\n");*/
+
+  //STI to get back to normal, since we are done with system critical setup
+  asm volatile("sti");
 
   //Init vm manager...
   //term_writestring(&tty0, "Initializing vm manager...");
