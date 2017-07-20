@@ -1,7 +1,8 @@
 all:
 	~/opt/cross/bin/i686-elf-as ./boot.S -o boot.o
 	~/opt/cross/bin/i686-elf-as ./isr.S -o isr.o
-	~/opt/cross/bin/i686-elf-as ./startup.S -o startup.o
+	#~/opt/cross/bin/i686-elf-as ./startup.asm -o startup.o
+	nasm -f elf32 ./startup.asm -o startup.o
 
 	~/opt/cross/bin/i686-elf-gcc -c \
 		./kernel.c \

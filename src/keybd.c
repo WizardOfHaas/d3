@@ -42,21 +42,20 @@ unsigned char kbdus[128] = {
 };
 
 char getScancode(){
-  outb(0x20, 0x20);
-  char c=0;
-  do {
-    if(inb(0x60)!=c){
-      c=inb(0x60);
-      if(c>0)
-        return c;
-    }
-  }while(1);
+    char c=0;
+    do {
+        if(inb(0x60)!=c) {
+            c=inb(0x60);
+            if(c>0)
+                return c;
+        }
+    } while(1);
 }
 
 char getchar(){
   char c = 0;
   while(c == 0){
-    c = kbdus[getScancode()];
+    c = kbdus[getScancode() + 1];
     return c;
   }
 }

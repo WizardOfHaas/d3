@@ -18,13 +18,16 @@
 #flush2:
 #    ret               ; Returns back to the C code!
 
-.section .text
+#.section .text
 
 .global gdt_flush
 .global idt_load
 
+.global isr0
+
 .extern gp
 .extern idtp
+.extern fault_handler
 
 gdt_flush:
 	lgdt (gp)
@@ -35,3 +38,38 @@ flush2:
 idt_load:
     lidt (idtp)
     ret
+
+#############ISR Routines
+#  0: Divide By Zero Exception
+isr0:
+    cli
+    pushl 0
+    pushl 0
+    jmp isr_common_stub
+
+isr_common_stub:
+	pusha
+	push %ds
+    push %es
+    push %fs
+    push %gs
+
+    movw $0x10, %ax
+    movw %ax, %ds
+    movw %ax, %es
+    movw %ax, %fs
+    movw %ax, %gs
+    mov %esp, %eax
+    push %eax
+
+    mov fault_handler, %eax
+    call *%eax
+
+    pop %eax
+    pop %gs
+    pop %fs
+    pop %es
+    pop %ds
+	popa
+	add 8, %esp
+	iret
