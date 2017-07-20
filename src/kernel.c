@@ -51,6 +51,9 @@ void cmain(multiboot_info_t* mbd)
   init_mm(mbd);
   term_writestring(&tty0, "[OK]\n");
 
+  //Init some hadware stuff...
+  init_keybd();
+
   //Init task manager...
   /*term_writestring(&tty0, "Initializing task manager...");
   init_tasker();
