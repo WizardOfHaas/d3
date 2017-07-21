@@ -18,6 +18,7 @@
 #include "fat12.h"
 
 term_t tty0;
+int uptime;
 
 void kernel_panic(const char* c){
   term_setcolor(&tty0, make_color(COLOR_LIGHT_GREY, COLOR_RED));
@@ -28,8 +29,7 @@ void kernel_panic(const char* c){
   while(1){}
 }
 
-void cmain(multiboot_info_t* mbd)
-{
+void cmain(multiboot_info_t* mbd){
   //Initialize first terminal
   term_init(&tty0, 80, 25, COLOR_LIGHT_GREY, COLOR_BLACK, (uint16_t*) 0xB8000);
 
@@ -53,6 +53,7 @@ void cmain(multiboot_info_t* mbd)
 
   //Init some hadware stuff...
   init_keybd();
+  init_timer();
 
   //Init task manager...
   /*term_writestring(&tty0, "Initializing task manager...");
@@ -74,4 +75,6 @@ void cmain(multiboot_info_t* mbd)
 
   term_writestring(&tty0, itoa(get_time(), 10));
   term_writestring(&tty0, "\n");
+
+  while(1){}
 }

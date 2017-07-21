@@ -12,5 +12,8 @@ int get_day_of_month();
 int32_t get_time();
 
 void sleep(int t);
+void timer_handler(struct regs *r);
+void init_timer();
+void timer_phase(int hz);
 
 #endif

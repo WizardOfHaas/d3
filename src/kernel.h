@@ -17,6 +17,7 @@ struct regs{
 };
 
 term_t tty0;
+int uptime;
 
 void kernel_panic(const char* c);
 
