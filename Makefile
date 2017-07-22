@@ -15,3 +15,8 @@ clean:
 
 test:
 	qemu-system-i386 -fda disk.img
+
+doit:
+	make all
+	sudo make install
+	make test

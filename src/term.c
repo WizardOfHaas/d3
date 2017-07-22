@@ -6,20 +6,17 @@
 #include "mem.h"
 #include "io.h"
 
-uint8_t make_color(enum vga_color fg, enum vga_color bg)
-{
+uint8_t make_color(enum vga_color fg, enum vga_color bg){
   return fg | bg << 4;
 }
  
-uint16_t make_vgaentry(term_t* term, char c)
-{
+uint16_t make_vgaentry(term_t* term, char c){
   uint16_t c16 = c;
   uint16_t color16 = term->color;
   return c16 | color16 << 8;
 }
 
-size_t strlen(const char* str)
-{
+size_t strlen(const char* str){
   size_t ret = 0;
   while ( str[ret] != 0 )
     ret++;
@@ -52,45 +49,44 @@ void term_scroll(term_t* term){
   mem_cpy(term->buffer, term->buffer + term->width, term->width*term->height*2);
 }
  
-void term_setcolor(term_t* term, uint8_t color)
-{
+void term_setcolor(term_t* term, uint8_t color){
   term->color = color;
 }
  
-void term_putentryat(term_t* term, char c, size_t x, size_t y)
-{
+void term_putentryat(term_t* term, char c, size_t x, size_t y){
   const size_t index = y * term->width + x;
   term->buffer[index] = make_vgaentry(term, c);
 }
  
-void term_putchar(term_t* term, char c)
-{
+void term_putchar(term_t* term, char c){
   if(c == '\n'){
     term->xpos = 0;
     term->ypos++;
+  }else if(c == '\b'){
+    if(term->ypos > 0){
+      term->xpos--;
+      term_putentryat(term, ' ', term->xpos, term->ypos);
+    }
   }else{
     term_putentryat(term, c, term->xpos, term->ypos);
 
-    if ( ++term->xpos == term->width )
-      {
-	term->xpos = 0;
-	term->ypos++;
-      }
+    if(++term->xpos == term->width){
+      term->xpos = 0;
+	    term->ypos++;
+    }
 
-    if ( term->ypos >= term->height )
-      {
-	term_scroll(term);
-	term->ypos--;
-      }   
+    if(term->ypos >= term->height){
+	   term_scroll(term);
+	   term->ypos--;
+    }   
   }
 
   update_cursor(term->ypos, term->xpos);
 }
  
-void term_writestring(term_t* term, const char* data)
-{
+void term_writestring(term_t* term, const char* data){
   size_t datalen = strlen(data);
-  for ( size_t i = 0; i < datalen; i++ ){
+  for (size_t i = 0; i < datalen; i++){
     term_putchar(term, data[i]);
   }
 }
