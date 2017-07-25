@@ -84,14 +84,16 @@ unsigned char kbdus_shifted[128] = {
     0,  /* All other keys are undefined */
 };
 
+//Data struct for keyboard buffer
 int kb_i = 0;
 char kb_buffer[256];
+
+//Status of shiftiness
+int kb_shifted = 0;
 
 void init_keybd(){
   irq_install_handler(1, keyboard_handler);
 }
-
-int kb_shifted = 0;
 
 /* Handles the keyboard interrupt */
 void keyboard_handler(struct regs *r){
@@ -111,8 +113,7 @@ void keyboard_handler(struct regs *r){
 
     if(scancode == 0x1C){
       term_writestring(&tty0, kb_buffer);
-      mem_set(&kb_buffer, 0, kb_i);
-      kb_i = 0;
+
     }
 
     //Add to keyboard buffer
@@ -125,4 +126,25 @@ void keyboard_handler(struct regs *r){
   }else if(scancode == 0x3A){ //Caps lock
     kb_shifted = !kb_shifted;
   }
+}
+
+//Clear buffer
+void clear_kb_buffer(){
+  mem_set(&kb_buffer, 0, 256);
+  kb_i = 0;
+}
+
+//Return the current buffer
+char get_kbd_buffer(){
+  return kb_buffer;
+}
+
+//Put buffer contents into given dest
+//...then clear out the buffer
+void get_kbd(char *dest){
+  while(kb_buffer[kb_i - 1] != "\n"){} //Wait for enter to be pressed...
+
+  mem_cpy(dest, &kb_buffer, kb_i - 1); //Coppy over buffer
+  dest[kb_i] = 0;
+  clear_kb_buffer(); //Clear out the internal buffer
 }

@@ -19,7 +19,7 @@ int mem_size;
 void* mem_cpy(void* dstptr, const void* srcptr, size_t size){
   /*Move data at &srcpty to &dstptr.
     No garuntee of what lies at &srcptr when done.    
-    Safe if &srcptr and &dstprt are close together.*/
+    Safe even if &srcptr and &dstprt are close together.*/
   unsigned char* dst = (unsigned char*) dstptr;
   const unsigned char* src = (const unsigned char*) srcptr;
 
