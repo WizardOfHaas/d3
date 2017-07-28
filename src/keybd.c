@@ -88,8 +88,9 @@ unsigned char kbdus_shifted[128] = {
 int kb_i = 0;
 char kb_buffer[256];
 
-//Status of shiftiness
+//Status of kayboard
 int kb_shifted = 0;
+volatile int kb_buffer_pending = 0; //C is weird so... MUST BE VOLATILE!
 
 void init_keybd(){
   irq_install_handler(1, keyboard_handler);
@@ -102,18 +103,17 @@ void keyboard_handler(struct regs *r){
   scancode = inb(0x60);
   char c;
 
-  if(kbdus[scancode] != 0 && scancode < 88){ //Normal printable character
+  if(kbdus[scancode] != 0 && scancode < 0x58){ //Normal printable character
     if(kb_shifted){
       c = kbdus_shifted[scancode];
     }else{
       c = kbdus[scancode];
     }
 
-    term_putchar(&tty0, c);
+    term_putchar(&tty0, c);//Echo the character
 
-    if(scancode == 0x1C){
-      term_writestring(&tty0, kb_buffer);
-
+    if(scancode == 0x1C){ //Enter pressed
+      kb_buffer_pending = 1;
     }
 
     //Add to keyboard buffer
@@ -130,8 +130,9 @@ void keyboard_handler(struct regs *r){
 
 //Clear buffer
 void clear_kb_buffer(){
-  mem_set(&kb_buffer, 0, 256);
+  mem_set(&kb_buffer, 0, 255);
   kb_i = 0;
+  kb_buffer_pending = 0;
 }
 
 //Return the current buffer
@@ -142,9 +143,9 @@ char get_kbd_buffer(){
 //Put buffer contents into given dest
 //...then clear out the buffer
 void get_kbd(char *dest){
-  while(kb_buffer[kb_i - 1] != "\n"){} //Wait for enter to be pressed...
+  while(!kb_buffer_pending){} //Get that lock on!
 
   mem_cpy(dest, &kb_buffer, kb_i - 1); //Coppy over buffer
-  dest[kb_i] = 0;
+  dest[kb_i] = 0; //Terminate that string!
   clear_kb_buffer(); //Clear out the internal buffer
 }

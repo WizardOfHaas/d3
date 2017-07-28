@@ -8,5 +8,6 @@ void get_kbd(char *dest);
 
 char kb_buffer[256];
 int kb_i;
+volatile int kb_buffer_pending;
 
 #endif
