@@ -74,13 +74,19 @@ void cmain(multiboot_info_t* mbd){
   //term_writestring(&tty0, "[OK]\n");
 
   term_writestring(&tty0, itoa(get_time(), 10));
-
+  
   char buffer[256];
 
   for(;;){
     term_writestring(&tty0, "\n>>>");
     get_kbd(&buffer);
-    term_writestring(&tty0, buffer);
+
+    if(strcmp(buffer, "test")){
+      term_writestring(&tty0, "AYYYYYY\n");
+    }else{
+      term_writestring(&tty0, buffer);
+    }
+
     mem_set(&buffer, 0, 256);
   }
 }

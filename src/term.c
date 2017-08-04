@@ -46,8 +46,16 @@ void term_clear(term_t* term, char c){
 }
 
 void term_scroll(term_t* term){
-  mem_cpy(term->buffer, term->buffer + term->width, term->width*term->height*2);
+  mem_cpy(term->buffer, term->buffer + term->width, term->width * term->height * 2);
 }
+
+/*void term_scroll(term_t* term){
+  for(int i = 0; i < term->height; i++){
+    for(int m = 0; m < term->width; m++){
+      term->buffer[i * term->width + m] = term->buffer[(i + 1) * term->width + m];
+    }
+  }
+}*/
  
 void term_setcolor(term_t* term, uint8_t color){
   term->color = color;
@@ -63,22 +71,28 @@ void term_putchar(term_t* term, char c){
     term->xpos = 0;
     term->ypos++;
   }else if(c == '\b'){
-    if(term->ypos > 0){
+    if(term->xpos > 0){
       term->xpos--;
       term_putentryat(term, ' ', term->xpos, term->ypos);
     }
-  }else{
-    term_putentryat(term, c, term->xpos, term->ypos);
+  }
 
-    if(++term->xpos == term->width){
-      term->xpos = 0;
-	    term->ypos++;
+  if(term->xpos + 1 >= term->width){ //Do I need to wrap?
+    term->xpos = 0; //Move x to 0
+	   term->ypos++; //Go to next line
+  }
+
+  if(term->ypos >= term->height){ //Do I need to scroll?
+    term_scroll(term); //Scroll 1 line
+    term->ypos--; //Push back y pos
+  }
+
+  if(c != '\n' && c != '\b'){
+    term_putentryat(term, c, term->xpos, term->ypos); //Put the character on screen
+
+    if(term->xpos < term->width){ //Advance to (now) sane screen location
+      term->xpos++;
     }
-
-    if(term->ypos >= term->height){
-	   term_scroll(term);
-	   term->ypos--;
-    }   
   }
 
   update_cursor(term->ypos, term->xpos);
@@ -92,7 +106,7 @@ void term_writestring(term_t* term, const char* data){
 }
 
 void update_cursor(int row, int col){
-    unsigned short position=(row*80) + col;
+    unsigned short position= (row * 80) + col;
  
     // cursor LOW port to vga INDEX register
     outb(0x3D4, 0x0F);
